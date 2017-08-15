@@ -14,3 +14,6 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('pagespeed/critical-css', 'Pagespeed\CriticalCssController@index');
+Route::get('pagespeed/critical-css/generate', 'Pagespeed\CriticalCssController@generate');
