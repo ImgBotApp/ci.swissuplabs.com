@@ -24,10 +24,11 @@ class CriticalCssController extends Controller
         ]);
 
         $process = new Process(sprintf(
-            "node %s/%s %s -m",
+            "node %s/%s %s -m -b %s",
             App::basePath(),
             self::CRITICAL_CLI_PATH,
-            escapeshellarg($request->input('website'))
+            escapeshellarg($request->input('website')),
+            App::basePath() . '/storage'
         ));
         $process->run();
 
