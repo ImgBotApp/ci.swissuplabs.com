@@ -21,4 +21,7 @@ php artisan key:generate
 
 # 4. install npm modules (omit `--production` key if you are frontend developer)
 npm install --production
+
+# 5. run the site (skip this step if you have a ready to use webserver)
+php artisan serve
 ```
