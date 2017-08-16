@@ -18,6 +18,7 @@ composer install
 
 # 3. prepare laravel application
 cp .env.example .env
+find storage bootstrap -type d -exec chmod 777 {} +
 php artisan key:generate
 
 # 4. install npm modules (omit `--production` key if you are frontend developer)
