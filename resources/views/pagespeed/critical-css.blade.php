@@ -18,10 +18,12 @@
                 Generate critical css styles for your website
             </p>
 
-            @if (session('status'))
-                <div class="message error w50 w100-sm push-center" data-component="message">
-                    {{ session('status') }}
-                </div>
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div class="message error w50 w100-sm push-center" data-component="message">
+                        {{ $error }}
+                    </div>
+                @endforeach
             @endif
 
             <form method="get" action="{{ action('Pagespeed\CriticalCssController@generate') }}" class="form">
@@ -32,7 +34,7 @@
                         users.
                     </div>
                     <div class="append w50 w100-sm push-center">
-                        <input type="text" name="website" placeholder="Website URL">
+                        <input type="text" name="website" placeholder="https://example.com">
                         <button class="button outline">Generate</button>
                     </div>
                 </div>
