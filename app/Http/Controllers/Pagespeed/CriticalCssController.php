@@ -28,7 +28,7 @@ class CriticalCssController extends Controller
             App::basePath(),
             self::CRITICAL_CLI_PATH,
             escapeshellarg($request->input('website')),
-            App::basePath() . '/storage'
+            App::basePath() . '/storage/app'
         ));
         $process->run();
 
