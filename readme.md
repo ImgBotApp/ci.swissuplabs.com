@@ -17,6 +17,7 @@ git clone git@github.com:swissup/ci.swissuplabs.com.git && cd ci.swissuplabs.com
 composer install
 
 # 3. prepare laravel application
+cp .env.example .env
 php artisan key:generate
 
 # 4. install npm modules (omit `--production` key if you are frontend developer)
