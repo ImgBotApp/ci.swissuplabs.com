@@ -26,7 +26,7 @@
                 @endforeach
             @endif
 
-            <form method="get" action="{{ action('Pagespeed\CriticalCssController@generate') }}" class="form">
+            <form id="critical-css" method="get" action="{{ action('Pagespeed\CriticalCssController@generate') }}" class="form">
                 <div class="form-item">
                     <div class="message focus fixed" data-component="message">
                         Made by <a href="https://swissuplabs.com" title="Magento extensions and themes">swissuplabs.com</a>
@@ -34,11 +34,20 @@
                         users.
                     </div>
                     <div class="append w50 w100-sm push-center">
-                        <button class="button outline">Generate</button>
                         <input type="url" name="website" placeholder="https://example.com" required/>
+                        <button id="submit" class="button outline" type="submit">Generate</button>
                     </div>
                 </div>
             </form>
         </div>
+
+        <script>
+            var form = document.getElementById('critical-css'),
+                button = document.getElementById('submit');
+
+            form.addEventListener('submit', function() {
+                button.classList.add('spinner', 'disabled');
+            });
+        </script>
     </body>
 </html>
