@@ -34,8 +34,8 @@
                         users.
                     </div>
                     <div class="append w50 w100-sm push-center">
-                        <input type="text" name="website" placeholder="https://example.com">
                         <button class="button outline">Generate</button>
+                        <input type="url" name="website" placeholder="https://example.com" required/>
                     </div>
                 </div>
             </form>
