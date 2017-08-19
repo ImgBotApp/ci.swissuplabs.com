@@ -46,7 +46,8 @@
                 button = document.getElementById('submit');
 
             form.addEventListener('submit', function() {
-                button.classList.add('spinner', 'disabled');
+                button.classList.add('spinner');
+                button.disabled = true;
             });
         </script>
     </body>
