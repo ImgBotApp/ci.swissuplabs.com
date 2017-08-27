@@ -8,6 +8,8 @@
         <title>Critical CSS</title>
 
         <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}"/>
+
+        @include('googletag')
     </head>
     <body class="pt4">
         <div class="container text-center">
