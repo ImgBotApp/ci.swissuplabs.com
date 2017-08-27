@@ -81,5 +81,7 @@
                 </div>
             </div>
         </div>
+
+        @include('analytics')
     </body>
 </html>

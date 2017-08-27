@@ -50,5 +50,7 @@
                 button.disabled = true;
             });
         </script>
+
+        @include('analytics')
     </body>
 </html>
