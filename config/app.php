@@ -168,6 +168,11 @@ return [
          */
         Laravel\Tinker\TinkerServiceProvider::class,
 
+        /**
+         * Third-party providers
+         */
+        Spatie\Activitylog\ActivitylogServiceProvider::class,
+
         /*
          * Application Service Providers...
          */
@@ -226,6 +231,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        'Activity' => Spatie\Activitylog\ActivitylogFacade::class,
     ],
 
 ];

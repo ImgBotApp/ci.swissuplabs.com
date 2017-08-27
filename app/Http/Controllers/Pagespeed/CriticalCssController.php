@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pagespeed;
 
 use App;
+use Activity;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Symfony\Component\Process\Process;
@@ -23,25 +24,33 @@ class CriticalCssController extends Controller
             'website' => 'required|url'
         ]);
 
-        $process = new Process(sprintf(
+        $command = sprintf(
             "node %s/%s %s -m -b %s",
             App::basePath(),
             self::CRITICAL_CLI_PATH,
             escapeshellarg($request->input('website')),
             App::basePath() . '/storage/app'
-        ));
+        );
+        $process = new Process($command);
         $process->run();
 
         if (!$process->isSuccessful()) {
             $status = 'Something went wrong.';
-            if (\App::environment(['local', 'staging', 'testing'])) {
+            if (App::environment(['local', 'staging', 'testing'])) {
                 $status = $process->getErrorOutput();
             }
 
-            // @todo: log everything!
+            Activity::log(sprintf(
+                'CriticalCSS: Failure. Input: %s; Output: %s',
+                $command,
+                $process->getErrorOutput()
+            ));
+
             return redirect()
                 ->action('Pagespeed\CriticalCssController@index')
                 ->withErrors([$status]);
+        } else {
+            Activity::log('CriticalCSS: Success. ' . $request->input('website'));
         }
 
         return response($process->getOutput(), 200, ['Content-Type' => 'text/plain']);
