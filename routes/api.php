@@ -16,3 +16,6 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware(\App\Http\Middleware\VerifyGithubSignature::class)
+    ->post('github/hook', 'Github\HookController@handle');
