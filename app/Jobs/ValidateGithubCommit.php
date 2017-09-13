@@ -208,15 +208,9 @@ class ValidateGithubCommit implements ShouldQueue
 
         $command = implode(' && ', [
             sprintf(
-                "%s/vendor/bin/phpcs --config-set installed_paths %s > /dev/null",
+                "%s/vendor/bin/phpcs %s --standard=MEQP2 --severity=10",
                 App::basePath(),
-                App::basePath() . '/vendor/magento/marketplace-eqp'
-            ),
-            sprintf(
-                "%s/vendor/bin/phpcs %s --standard=%s --severity=10",
-                App::basePath(),
-                $folder,
-                App::basePath() . '/vendor/magento/marketplace-eqp/MEQP2'
+                $folder
             )
         ]);
 
