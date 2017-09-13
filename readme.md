@@ -20,6 +20,8 @@ composer install
 cp .env.example .env
 find storage bootstrap -type d -exec chmod 777 {} +
 php artisan key:generate
+php artisan migrate
+php artisan storage:link
 
 # 4. install npm modules (omit `--production` key if you are frontend developer)
 npm install --production
