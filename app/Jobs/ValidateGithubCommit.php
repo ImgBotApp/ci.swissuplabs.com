@@ -19,6 +19,10 @@ class ValidateGithubCommit implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    const SUCCESS   = 'success';
+    const ERROR     = 'error';
+    const FAILURE   = 'failure';
+
     protected $payload;
 
     /**
@@ -32,6 +36,46 @@ class ValidateGithubCommit implements ShouldQueue
     }
 
     /**
+     * Retrieve repo name
+     *
+     * @return string
+     */
+    private function getRepositoryOwnerName()
+    {
+        return array_get($this->payload, 'repository.owner.name');
+    }
+
+    /**
+     * Retrieve repo name
+     *
+     * @return string
+     */
+    private function getRepositoryName()
+    {
+        return array_get($this->payload, 'repository.name');
+    }
+
+    /**
+     * Retrieve repo full name
+     *
+     * @return string
+     */
+    private function getRepositoryFullName()
+    {
+        return array_get($this->payload, 'repository.full_name');
+    }
+
+    /**
+     * Retrieve commit sha
+     *
+     * @return string
+     */
+    private function getSha()
+    {
+        return array_get($this->payload, 'head_commit.id');
+    }
+
+    /**
      * Execute the job.
      *
      * @return void
@@ -39,11 +83,73 @@ class ValidateGithubCommit implements ShouldQueue
     public function handle()
     {
         try {
-            $testErrors = $this->downloadSources()->runTests();
-            // update commit status at github.com
+            $status = self::SUCCESS;
+            $description = 'Validation Succeeded';
+            $targetUrl = '';
+
+            $errors = $this->downloadSources()->runTests();
+
+            if ($errors) {
+                $status = self::ERROR;
+                $description = 'Validation Failed';
+                $targetUrl = $this->saveResult($errors);
+            }
+
+            $this->createCommitStatus(
+                $status,
+                $description,
+                $targetUrl
+            );
+
         } catch (\Exception $e) {
             Activity::log('ValidateGithubCommit: Failure. ' . $e->getMessage());
+            $this->createCommitStatus(self::FAILURE, 'Internal server error');
         }
+    }
+
+    private function createCommitStatus($state, $description, $targetUrl = '')
+    {
+        $client = new \Github\Client();
+
+        $client->authenticate(config('github.token'), \Github\Client::AUTH_HTTP_TOKEN);
+
+        $client->api('repo')->statuses()->create(
+            $this->getRepositoryOwnerName(),
+            $this->getRepositoryName(),
+            $this->getSha(),
+            [
+                'state'       => $state,
+                'description' => $description,
+                'target_url'  => $targetUrl,
+                'context'     => 'continuous-integration/ci.swissuplabs.com'
+            ]
+        );
+    }
+
+    /**
+     * Save rendered result into public folder
+     *
+     * @param  string $text Errors
+     * @return string       Public URL
+     */
+    private function saveResult($text)
+    {
+        $sha = $this->getSha();
+        $repository = $this->getRepositoryFullName();
+
+        $data = [
+            'sha'        => $sha,
+            'repository' => $repository,
+            'text'       => $text,
+        ];
+
+        $filePath = 'phpcs/' . $repository . '/' . $this->getSha() . '.html';
+        Storage::disk('public')->put(
+            $filePath,
+            view('github/phpcs', $data)->render()
+        );
+
+        return asset(Storage::disk('public')->url($filePath));
     }
 
     /**
@@ -54,7 +160,7 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function downloadSources()
     {
-        $repository = array_get($this->payload, 'repository.full_name');
+        $repository = $this->getRepositoryFullName();
         $cloneUrl   = array_get($this->payload, 'repository.clone_url');
         $cloneUrl   = str_replace(
             'https://',
@@ -62,7 +168,7 @@ class ValidateGithubCommit implements ShouldQueue
             $cloneUrl
         );
 
-        Storage::makeDirectory($repository);
+        Storage::disk('local')->makeDirectory($repository);
 
         // @todo: replace this code with archive download
         // in case of slow git fetch command
@@ -72,7 +178,7 @@ class ValidateGithubCommit implements ShouldQueue
             'cd ' . $folder,
             'git init',
             'git fetch ' . escapeshellarg($cloneUrl),
-            'git checkout ' . escapeshellarg(array_get($this->payload, 'head_commit.id')),
+            'git checkout ' . escapeshellarg($this->getSha()),
         ]);
 
         $process = new Process($command);
@@ -97,7 +203,7 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function runTests()
     {
-        $repository = array_get($this->payload, 'repository.full_name');
+        $repository = $this->getRepositoryFullName();
         $folder = escapeshellarg(storage_path('app/' . $repository));
 
         $command = implode(' && ', [
@@ -107,7 +213,7 @@ class ValidateGithubCommit implements ShouldQueue
                 App::basePath() . '/vendor/magento/marketplace-eqp'
             ),
             sprintf(
-                "%s/vendor/bin/phpcs %s --standard=%s --severity=8",
+                "%s/vendor/bin/phpcs %s --standard=%s --severity=10",
                 App::basePath(),
                 $folder,
                 App::basePath() . '/vendor/magento/marketplace-eqp/MEQP2'
