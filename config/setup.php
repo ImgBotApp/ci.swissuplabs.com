@@ -54,7 +54,7 @@ return [
                     storage_path('app/tools/m2')
                 ),
                 sprintf(
-                    "cd %s && composer install --no-dev && bin/magento module:enable --all", // && bin/magento setup:di:compile
+                    "cd %s && composer install --no-dev --ignore-platform-reqs && bin/magento module:enable --all", // && bin/magento setup:di:compile
                     storage_path('app/tools/m2')
                 ),
             ],
