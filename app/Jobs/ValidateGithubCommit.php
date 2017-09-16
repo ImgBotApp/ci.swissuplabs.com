@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App;
 use Activity;
+use App\Lib\Github;
 use App\Lib\Terminal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -106,11 +107,7 @@ class ValidateGithubCommit implements ShouldQueue
 
     private function createCommitStatus($state, $description, $targetUrl = '')
     {
-        $client = new \Github\Client();
-
-        $client->authenticate(config('github.token'), \Github\Client::AUTH_HTTP_TOKEN);
-
-        $client->api('repo')->statuses()->create(
+        Github::api('repo')->statuses()->create(
             $this->getRepositoryOwnerName(),
             $this->getRepositoryName(),
             $this->getSha(),

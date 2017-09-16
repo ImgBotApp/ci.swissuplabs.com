@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Lib\Github;
 use App\Lib\Terminal;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
@@ -62,9 +63,6 @@ class SetupApplication extends Command
      */
     private function processTools($group)
     {
-        $client = new \Github\Client();
-        $client->authenticate(config('github.token'), \Github\Client::AUTH_HTTP_TOKEN);
-
         $storage = Storage::disk('local');
         foreach ($group as $code => $values) {
             if (empty($values['active'])) {
@@ -79,7 +77,7 @@ class SetupApplication extends Command
 
             $storage->put(
                 $archive,
-                $client->api('repo')->contents()->archive(
+                Github::api('repo')->contents()->archive(
                     $values['username'],
                     $values['repository'],
                     'tarball',
