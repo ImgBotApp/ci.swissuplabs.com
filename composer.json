@@ -9,7 +9,6 @@
         "knplabs/github-api": "^2.5",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
-        "magento/marketplace-eqp": "^1.0",
         "php-http/guzzle6-adapter": "^1.1",
         "spatie/activitylog": "^2.4"
     },
@@ -40,24 +39,16 @@
         ],
         "post-install-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
-            "php artisan optimize",
-            "\"vendor/bin/phpcs\" --config-set installed_paths ../../magento/marketplace-eqp"
+            "php artisan optimize"
         ],
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate",
-            "php artisan optimize",
-            "\"vendor/bin/phpcs\" --config-set installed_paths ../../magento/marketplace-eqp"
+            "php artisan optimize"
         ]
     },
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
         "optimize-autoloader": true
-    },
-    "repositories": {
-        "magento/marketplace-eqp": {
-            "type": "vcs",
-            "url": "git@github.com:magento/marketplace-eqp.git"
-        }
     }
 }

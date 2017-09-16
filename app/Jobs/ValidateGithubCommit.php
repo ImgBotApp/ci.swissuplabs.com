@@ -209,7 +209,7 @@ class ValidateGithubCommit implements ShouldQueue
         $command = implode(' && ', [
             sprintf(
                 "%s/vendor/bin/phpcs %s --standard=MEQP2 --severity=10",
-                App::basePath(),
+                storage_path('app/tools/meqp'),
                 $folder
             )
         ]);
