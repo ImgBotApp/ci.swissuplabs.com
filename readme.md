@@ -22,6 +22,8 @@ find storage bootstrap -type d -exec chmod 777 {} +
 php artisan key:generate
 php artisan migrate
 php artisan storage:link
+# Setup GitHub webhook secret and access token. Download test tools and prepare environment
+php artisan app:setup
 
 # 4. install npm modules (omit `--production` key if you are frontend developer)
 npm install --production
