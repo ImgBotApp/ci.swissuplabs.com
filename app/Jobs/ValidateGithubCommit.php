@@ -4,16 +4,13 @@ namespace App\Jobs;
 
 use App;
 use Activity;
-
+use App\Lib\Terminal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class ValidateGithubCommit implements ShouldQueue
 {
@@ -181,16 +178,7 @@ class ValidateGithubCommit implements ShouldQueue
             'git checkout ' . escapeshellarg($this->getSha()),
         ]);
 
-        $process = new Process($command);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new \Exception(sprintf(
-                'Input: %s; Output: %s',
-                $command,
-                $process->getErrorOutput()
-            ));
-        }
+        Terminal::exec($command);
 
         return $this;
     }
@@ -214,19 +202,6 @@ class ValidateGithubCommit implements ShouldQueue
             )
         ]);
 
-        $process = new Process($command);
-        $process->run();
-
-        // phpcs uses exit(1) if validation errors where found, so in order
-        // to detect if it was really a terminal error - checkout error_output too
-        if (!$process->isSuccessful() && $process->getErrorOutput()) {
-            throw new \Exception(sprintf(
-                'Input: %s; Output: %s',
-                $command,
-                $process->getErrorOutput()
-            ));
-        }
-
-        return $process->getOutput();
+        return Terminal::exec($command);
     }
 }

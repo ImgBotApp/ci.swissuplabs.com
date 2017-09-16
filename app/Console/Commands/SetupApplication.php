@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Lib\Terminal;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Process\Process;
 
 class SetupApplication extends Command
 {
@@ -96,32 +96,14 @@ class SetupApplication extends Command
                 storage_path("app/{$archive}"),
                 storage_path("app/{$destination}")
             );
-            $process = new Process($command);
-            $process->run();
-
-            if (!$process->isSuccessful()) {
-                throw new \Exception(sprintf(
-                    'Input: %s; Output: %s',
-                    $command,
-                    $process->getErrorOutput()
-                ));
-            }
+            Terminal::exec($command);
 
             if (empty($values['postinstall'])) {
                 continue;
             }
 
             foreach ($values['postinstall'] as $command) {
-                $process = new Process($command);
-                $process->run();
-
-                if (!$process->isSuccessful()) {
-                    throw new \Exception(sprintf(
-                        'Input: %s; Output: %s',
-                        $command,
-                        $process->getErrorOutput()
-                    ));
-                }
+                Terminal::exec($command);
             }
         }
     }
