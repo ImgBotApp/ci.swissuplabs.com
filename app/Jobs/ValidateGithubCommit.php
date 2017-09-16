@@ -80,6 +80,10 @@ class ValidateGithubCommit implements ShouldQueue
      */
     public function handle()
     {
+        if (!$this->canHandle()) {
+            return;
+        }
+
         try {
             $status = self::SUCCESS;
             $description = 'Validation Succeeded';
@@ -103,6 +107,41 @@ class ValidateGithubCommit implements ShouldQueue
             Activity::log('ValidateGithubCommit: Failure. ' . $e->getMessage());
             $this->createCommitStatus(self::FAILURE, 'Internal server error');
         }
+    }
+
+    /**
+     * Check if we can test the commit
+     *
+     * @return boolean
+     */
+    private function canHandle()
+    {
+        try {
+            $json = Github::api('repo')->contents()->show(
+                $this->getRepositoryOwnerName(),
+                $this->getRepositoryName(),
+                'composer.json',
+                $this->getSha()
+            );
+
+            $json = json_decode(base64_decode($json['content']), true);
+
+            if (!$json) {
+                $this->createCommitStatus(self::ERROR, 'Error in composer.json file');
+            }
+
+            if (!$json
+                || !isset($json['type'])
+                || $json['type'] !== 'magento2-module') {
+
+                return false;
+            }
+
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 
     private function createCommitStatus($state, $description, $targetUrl = '')
