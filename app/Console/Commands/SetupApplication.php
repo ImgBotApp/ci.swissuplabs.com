@@ -51,6 +51,7 @@ class SetupApplication extends Command
                 break;
             }
         }
+        $this->info('Setup is successfully completed.');
     }
 
     /**
