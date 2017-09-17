@@ -23,6 +23,8 @@ class ValidateGithubCommit implements ShouldQueue
 
     protected $payload;
 
+    protected $repositoryType;
+
     /**
      * Create a new job instance.
      *
@@ -74,13 +76,53 @@ class ValidateGithubCommit implements ShouldQueue
     }
 
     /**
+     * Read package type from composer.json
+     *
+     * @return string|false
+     */
+    private function getRepositoryType()
+    {
+        if (null !== $this->repositoryType) {
+            return $this->repositoryType;
+        }
+
+        $this->repositoryType = false;
+
+        try {
+            $fileInfo = Github::api('repo')->contents()->show(
+                $this->getRepositoryOwnerName(),
+                $this->getRepositoryName(),
+                'composer.json',
+                $this->getSha()
+            );
+
+            $json = json_decode(base64_decode($fileInfo['content']), true);
+
+            if (!$json) {
+                $this->createCommitStatus(self::ERROR, 'Error in composer.json file');
+            }
+
+            if (isset($json['type'])) {
+                $this->repositoryType = $json['type'];
+            }
+
+        } catch (\Exception $e) {
+            // composer.json file not found
+            return false;
+        }
+
+        return $this->repositoryType;
+    }
+
+    /**
      * Execute the job.
      *
      * @return void
      */
     public function handle()
     {
-        if (!$this->canHandle()) {
+        $type = $this->getRepositoryType();
+        if (!in_array($type, $this->getSupportedRepositoryTypes())) {
             return;
         }
 
@@ -110,40 +152,23 @@ class ValidateGithubCommit implements ShouldQueue
     }
 
     /**
-     * Check if we can test the commit
+     * Get array of supported package types
      *
-     * @return boolean
+     * @return array
      */
-    private function canHandle()
+    private function getSupportedRepositoryTypes()
     {
-        try {
-            $json = Github::api('repo')->contents()->show(
-                $this->getRepositoryOwnerName(),
-                $this->getRepositoryName(),
-                'composer.json',
-                $this->getSha()
-            );
-
-            $json = json_decode(base64_decode($json['content']), true);
-
-            if (!$json) {
-                $this->createCommitStatus(self::ERROR, 'Error in composer.json file');
-            }
-
-            if (!$json
-                || !isset($json['type'])
-                || $json['type'] !== 'magento2-module') {
-
-                return false;
-            }
-
-        } catch (\Exception $e) {
-            return false;
-        }
-
-        return true;
+        return array_keys(config('tests'));
     }
 
+    /**
+     * Create commit status at github.com
+     *
+     * @param  string $state
+     * @param  string $description
+     * @param  string $targetUrl
+     * @return void
+     */
     private function createCommitStatus($state, $description, $targetUrl = '')
     {
         Github::api('repo')->statuses()->create(
@@ -227,17 +252,17 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function runTests()
     {
-        $repository = $this->getRepositoryFullName();
-        $folder = escapeshellarg(storage_path('app/' . $repository));
+        $tests = array_merge(
+            config('tests.default', []),
+            config('tests.' . $this->getRepositoryType(), [])
+        );
 
-        $command = implode(' && ', [
-            sprintf(
-                "%s/vendor/bin/phpcs %s --standard=MEQP2 --severity=10",
-                storage_path('app/tools/meqp'),
-                $folder
-            )
-        ]);
-
-        return Terminal::exec($command);
+        foreach ($tests as $test) {
+            $class = new $test;
+            $class
+                ->setPath(storage_path('app/' . $this->getRepositoryFullName()))
+                ->setRepositoryType($this->getRepositoryType())
+                ->run();
+        }
     }
 }
