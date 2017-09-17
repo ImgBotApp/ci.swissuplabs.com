@@ -11,6 +11,8 @@ class Test
     public function setPath($path)
     {
         $this->path = $path;
+
+        return $this;
     }
 
     public function getPath()
@@ -21,6 +23,8 @@ class Test
     public function setRepositoryType($type)
     {
         $this->repositoryType = $type;
+
+        return $this;
     }
 
     public function getRepositoryType()
