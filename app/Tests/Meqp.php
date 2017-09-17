@@ -6,6 +6,17 @@ use App\Lib\Terminal;
 
 class Meqp extends Test
 {
+    public function getTitle()
+    {
+        return 'Marketplace EQP';
+    }
+
+    /**
+     * Run the test and return console output.
+     * If the test was successfull, result will be an empty string.
+     *
+     * @return string
+     */
     public function run()
     {
         $command = implode(' && ', [

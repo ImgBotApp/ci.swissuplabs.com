@@ -10,9 +10,13 @@
         <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}"/>
     </head>
     <body>
-        <pre class="mb0">
-            {{ $text }}
-        </pre>
+
+        <div class="container">
+            @foreach ($results as $title => $text)
+                <h3>{{ $title }}</h3>
+                <pre class="mb0">{{ ($text) ? $text : "OK" }}</pre>
+            @endforeach
+        </div>
 
         @include('analytics')
     </body>

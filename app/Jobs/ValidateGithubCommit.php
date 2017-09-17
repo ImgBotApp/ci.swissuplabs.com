@@ -128,16 +128,21 @@ class ValidateGithubCommit implements ShouldQueue
 
         try {
             $status = self::SUCCESS;
-            $description = 'Validation Succeeded';
             $targetUrl = '';
 
-            $errors = $this->downloadSources()->runTests();
+            $result = $this->downloadSources()->runTests();
 
-            if ($errors) {
+            $failedTests = array_filter($result);
+            if ($failedTests) {
                 $status = self::ERROR;
-                $description = 'Validation Failed';
-                $targetUrl = $this->saveResult($errors);
+                $targetUrl = $this->saveResult($result);
             }
+
+            $description = sprintf(
+                "%s / %s checks OK",
+                count($result) - count($failedTests),
+                count($result)
+            );
 
             $this->createCommitStatus(
                 $status,
@@ -187,10 +192,10 @@ class ValidateGithubCommit implements ShouldQueue
     /**
      * Save rendered result into public folder
      *
-     * @param  string $text Errors
+     * @param  array $text  result of runTests method
      * @return string       Public URL
      */
-    private function saveResult($text)
+    private function saveResult($testResults)
     {
         $sha = $this->getSha();
         $repository = $this->getRepositoryFullName();
@@ -198,7 +203,7 @@ class ValidateGithubCommit implements ShouldQueue
         $data = [
             'sha'        => $sha,
             'repository' => $repository,
-            'text'       => $text,
+            'results'    => $testResults,
         ];
 
         $filePath = 'phpcs/' . $repository . '/' . $this->getSha() . '.html';
@@ -257,12 +262,17 @@ class ValidateGithubCommit implements ShouldQueue
             config('tests.' . $this->getRepositoryType(), [])
         );
 
+        $result = [];
         foreach ($tests as $test) {
             $class = new $test;
-            $class
+
+            $output = $class
                 ->setPath(storage_path('app/' . $this->getRepositoryFullName()))
                 ->setRepositoryType($this->getRepositoryType())
                 ->run();
+
+            $result[$class->getTitle()] = trim($output);
         }
+        return $result;
     }
 }

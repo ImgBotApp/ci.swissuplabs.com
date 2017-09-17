@@ -8,6 +8,11 @@ class Test
 
     protected $repositoryType;
 
+    public function getTitle()
+    {
+        return static::class;
+    }
+
     public function setPath($path)
     {
         $this->path = $path;
