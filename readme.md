@@ -31,3 +31,50 @@ npm install --production
 # 5. run the site (skip this step if you have a ready to use webserver)
 php artisan serve
 ```
+
+## Upgrade
+
+```bash
+git pull
+composer install
+php artisan migrate
+php artisan app:setup
+php artisan queue:restart
+```
+
+## Configuring Supervisor
+
+If you would like to use database driver to process queue jobs, you need to
+configure supervisor.
+
+Supervisor is a process monitor for the Linux operating system, and will
+automatically restart your `queue:work` process if it fails.
+
+Generate config using `echo_supervisord_conf` script:
+
+```bash
+echo_supervisord_conf > /home/www/ci.swissuplabs.com/supervisord.conf
+```
+
+Add new section into it:
+
+```ini
+[program:ci.swissuplabs.com]
+process_name=%(program_name)s_%(process_num)02d
+command=php /home/www/ci.swissuplabs.com/artisan queue:work
+autostart=true
+autorestart=true
+user=swissuplabs
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/home/www/ci.swissuplabs.com/worker.log
+```
+
+Start supervisor:
+
+```bash
+supervisord -c /home/www/ci.swissuplabs.com/supervisord.conf
+supervisorctl reread
+supervisorctl update
+supervisorctl start ci.swissuplabs.com:*
+```
