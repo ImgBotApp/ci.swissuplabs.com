@@ -9,5 +9,9 @@ return [
     'magento2-module' => [
         App\Tests\Meqp::class
     ],
+    
+    'magento-module' => [
+        App\Tests\Meqp::class
+    ],
 
 ];
