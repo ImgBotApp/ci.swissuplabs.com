@@ -230,6 +230,7 @@ class ValidateGithubCommit implements ShouldQueue
             'https://' . config('github.token') . '@',
             $cloneUrl
         );
+        $ref = array_get($this->payload, 'ref');
 
         Storage::disk('local')->makeDirectory($repository);
 
@@ -240,7 +241,7 @@ class ValidateGithubCommit implements ShouldQueue
         $command = implode(' && ', [
             'cd ' . $folder,
             'git init',
-            'git fetch ' . escapeshellarg($cloneUrl),
+            'git fetch ' . escapeshellarg($cloneUrl) . ' ' . escapeshellarg($ref),
             'git checkout ' . escapeshellarg($this->getSha()),
         ]);
 
