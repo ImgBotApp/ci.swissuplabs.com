@@ -32,7 +32,7 @@ class Phplint extends Test
             )
         ]);
         $output = Terminal::exec($command);
-
+        $output = str_replace(storage_path(), '', $output);
         $output = explode("\n", $output);
         // $output = array_filter($output);
         $output = array_filter($output, function ($str) {
