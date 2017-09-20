@@ -38,6 +38,7 @@ php artisan serve
 git pull
 composer install
 php artisan migrate
+php artisan cache:clear
 php artisan app:setup
 php artisan queue:restart
 ```
