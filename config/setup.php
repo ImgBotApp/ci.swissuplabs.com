@@ -94,7 +94,7 @@ return [
         |--------------------------------------------------------------------------
         */
         'phpmd' => [
-            'active' => true,
+            'active' => false,
             'bin' => 'tools/phpmd',
             'postinstall' => [
                 'wget -c http://static.phpmd.org/php/latest/phpmd.phar',
@@ -109,7 +109,7 @@ return [
         |--------------------------------------------------------------------------
         */
         'eslint' => [
-            'active' => true,
+            'active' => false,
             'bin' => 'tools/node_modules/.bin/eslint',
             'postinstall' => [
                 'npm install --prefix ' . storage_path('app/tools') . ' eslint',
@@ -122,7 +122,7 @@ return [
         |--------------------------------------------------------------------------
         */
         'jscs' => [
-            'active' => true,
+            'active' => false,
             'bin' => 'tools/node_modules/.bin/jscs',
             'postinstall' => [
                 'npm install --prefix ' . storage_path('app/tools') . ' jscs',
