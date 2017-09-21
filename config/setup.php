@@ -73,6 +73,61 @@ return [
             'ref' => 'magento-ce-1.9.3.4',
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Php copy/paste detector
+        |--------------------------------------------------------------------------
+        */
+        'phpcpd' => [
+            'active' => true,
+            'bin' => 'tools/phpcpd',
+            'postinstall' => [
+                'wget https://phar.phpunit.de/phpcpd.phar',
+                'chmod +x phpcpd.phar',
+                'mv phpcpd.phar '  . storage_path('app/tools/phpcpd')
+            ]
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Php mess detector
+        |--------------------------------------------------------------------------
+        */
+        'phpmd' => [
+            'active' => true,
+            'bin' => 'tools/phpmd',
+            'postinstall' => [
+                'wget -c http://static.phpmd.org/php/latest/phpmd.phar',
+                'chmod +x phpmd.phar',
+                'mv phpmd.phar '  . storage_path('app/tools/phpmd')
+            ]
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | ESLint
+        |--------------------------------------------------------------------------
+        */
+        'eslint' => [
+            'active' => true,
+            'bin' => 'tools/node_modules/.bin/eslint',
+            'postinstall' => [
+                'npm install --prefix ' . storage_path('app/tools') . ' eslint',
+            ]
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | JSCS
+        |--------------------------------------------------------------------------
+        */
+        'jscs' => [
+            'active' => true,
+            'bin' => 'tools/node_modules/.bin/jscs',
+            'postinstall' => [
+                'npm install --prefix ' . storage_path('app/tools') . ' jscs',
+            ]
+        ],
     ]
 
 ];

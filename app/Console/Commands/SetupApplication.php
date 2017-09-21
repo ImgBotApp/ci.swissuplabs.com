@@ -69,34 +69,40 @@ class SetupApplication extends Command
                 continue;
             }
 
-            $archive = 'tools/__archive/' . $values['repository'] . '-' . $values['ref'] . '.tar';
+            if (isset($values['repository'])) {
+                $archive = 'tools/__archive/' . $values['repository'] . '-' . $values['ref'] . '.tar';
 
-            if ($storage->exists($archive) && !$this->option('force')) {
-                continue;
+                if ($storage->exists($archive) && !$this->option('force')) {
+                    continue;
+                }
+
+                $storage->put(
+                    $archive,
+                    Github::api('repo')->contents()->archive(
+                        $values['username'],
+                        $values['repository'],
+                        'tarball',
+                        $values['ref']
+                    )
+                );
+
+                $destination = 'tools/' . $code;
+                $storage->deleteDirectory($destination);
+                $storage->makeDirectory($destination);
+
+                $command = sprintf(
+                    "tar -xf %s --directory %s --strip-components=1",
+                    storage_path("app/{$archive}"),
+                    storage_path("app/{$destination}")
+                );
+                Terminal::exec($command);
             }
 
-            $storage->put(
-                $archive,
-                Github::api('repo')->contents()->archive(
-                    $values['username'],
-                    $values['repository'],
-                    'tarball',
-                    $values['ref']
-                )
-            );
-
-            $destination = 'tools/' . $code;
-            $storage->deleteDirectory($destination);
-            $storage->makeDirectory($destination);
-
-            $command = sprintf(
-                "tar -xf %s --directory %s --strip-components=1",
-                storage_path("app/{$archive}"),
-                storage_path("app/{$destination}")
-            );
-            Terminal::exec($command);
-
-            if (empty($values['postinstall'])) {
+            if (empty($values['postinstall']) ||
+                (isset($values['bin']) &&
+                $storage->exists($values['bin']) &&
+                !$this->option('force'))
+            ) {
                 continue;
             }
 

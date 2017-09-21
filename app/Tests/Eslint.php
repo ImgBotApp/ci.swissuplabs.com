@@ -22,12 +22,12 @@ class Eslint extends Test
     {
         $command = implode(' && ', [
             sprintf(
-                "eslint --config %s --ext .js %s",
+                "%s --config %s --ext .js %s",
+                storage_path('app/tools/node_modules/.bin/eslint'),
                 storage_path('app/tools/m2/dev/tests/static/testsuite/Magento/Test/Js/_files/eslint/.eslintrc-magento'),
                 /*escapeshellarg(*/$this->getPath() . '/view/**'/*)*/
             )
         ]);
-        // dd($command);
         return Terminal::exec($command);
     }
 }

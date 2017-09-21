@@ -26,7 +26,8 @@ class Phpmd extends Test
     {
         $command = implode(' && ', [
             sprintf(
-                "phpmd %s text %s",
+                "%s %s text %s",
+                storage_path('app/tools/phpmd'),
                 escapeshellarg($this->getPath()),
                 storage_path('app/tools/m2/dev/tests/static/testsuite/Magento/Test/Php/_files/phpmd/ruleset.xml')
             )

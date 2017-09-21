@@ -23,7 +23,8 @@ class Jscs extends Test
     {
         $command = implode(' && ', [
             sprintf(
-                "jscs %s --config %s",
+                "%s %s --config %s",
+                storage_path('app/tools/node_modules/.bin/jscs'),
                 /*escapeshellarg(*/$this->getPath() . '/view/**'/*)*/,
                 storage_path('app/tools/m2/dev/tests/static/testsuite/Magento/Test/Js/_files/jscs/.jscsrc')
             )
