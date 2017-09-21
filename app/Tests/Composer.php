@@ -1,7 +1,7 @@
 <?php
 namespace App\Tests;
 
-use App\Lib\Terminal;
+use Symfony\Component\Process\Process;
 
 class Composer extends Test
 {
@@ -24,6 +24,14 @@ class Composer extends Test
                 escapeshellarg($this->getPath() . '/composer.json')
             )
         ]);
-        return Terminal::exec($command);
+
+        $process = new Process($command);
+        $process->run();
+
+        if (!$process->isSuccessful() && $process->getErrorOutput()) {
+            return $process->getErrorOutput();
+        }
+
+        return '';
     }
 }
