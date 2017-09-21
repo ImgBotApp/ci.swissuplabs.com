@@ -10,7 +10,7 @@ class Eslint extends Test
 {
     public function getTitle()
     {
-        return 'ESLint js code style validation';
+        return 'ESLint';
     }
     /**
      * Run the test and return console output.

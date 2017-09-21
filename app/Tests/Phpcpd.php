@@ -4,13 +4,13 @@ namespace App\Tests;
 use App\Lib\Terminal;
 
 /**
- * @see http://docs.swissuplabs.com/m1/dev/#phpcpd
+ * @see http://docs.swissuplabs.com/m1/dev/#php-copypaste-detector-phpcpd
  */
 class Phpcpd extends Test
 {
     public function getTitle()
     {
-        return 'Copy/Paste Detector for PHP code';
+        return 'Copy/Paste Detector';
     }
 
     /**

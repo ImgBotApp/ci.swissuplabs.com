@@ -10,7 +10,7 @@ class Jscs extends Test
 {
     public function getTitle()
     {
-        return 'JSCS is a code style linter and formatter for your style guide';
+        return 'JSCS';
     }
 
     /**

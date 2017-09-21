@@ -10,7 +10,7 @@ class Phplint extends Test
 {
     public function getTitle()
     {
-        return 'Native php linter';
+        return 'PHP Linter';
     }
 
     /**
