@@ -7,6 +7,7 @@ return [
         App\Tests\Composer::class,
         App\Tests\Phpcpd::class,
         App\Tests\Meqp::class,
+        // App\Tests\Phpmd::class,
     ],
 
     'magento2-module' => [
