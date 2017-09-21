@@ -82,9 +82,7 @@ class SetupApplication extends Command
                     continue;
                 }
 
-                $destination = 'tools/' . $code;
-
-                $downloader->download($values, $destination);
+                $downloader->download($values, 'tools/' . $code);
 
                 if (!empty($values['postinstall'])) {
                     foreach ($values['postinstall'] as $command) {
