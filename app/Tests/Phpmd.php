@@ -5,9 +5,6 @@ use App\Lib\Terminal;
 
 /**
  * @see http://docs.swissuplabs.com/m1/dev/#phpmd
- * wget -c http://static.phpmd.org/php/latest/phpmd.phar
- * sudo chmod a+x phpmd.phar
- * sudo mv phpmd.phar /usr/local/bin/phpmd
  */
 class Phpmd extends Test
 {

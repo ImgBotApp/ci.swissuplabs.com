@@ -11,6 +11,7 @@ return [
     ],
 
     'magento2-module' => [
+        App\Tests\Phpunit::class,
         // App\Tests\Eslint::class,
         // App\Tests\Jscs::class,
     ],
