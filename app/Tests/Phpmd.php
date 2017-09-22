@@ -4,7 +4,7 @@ namespace App\Tests;
 use App\Lib\Terminal;
 
 /**
- * @see http://docs.swissuplabs.com/m1/dev/#phpmd
+ * @see http://docs.swissuplabs.com/m1/dev/#php-mess-detector
  */
 class Phpmd extends Test
 {

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use App\Lib\Github;
 use App\Lib\Terminal;
 use Illuminate\Console\Command;
@@ -63,51 +64,35 @@ class SetupApplication extends Command
      */
     private function processTools($group)
     {
-        $storage = Storage::disk('local');
-        foreach ($group as $code => $values) {
-            if (empty($values['active'])) {
-                continue;
-            }
+        foreach ($group as $downloader => $tools) {
+            $downloader = ucfirst($downloader);
+            $downloader = "\\App\\Downloader\\{$downloader}";
+            $downloader = new $downloader;
 
-            if (isset($values['repository'])) {
-                $archive = 'tools/__archive/' . $values['repository'] . '-' . $values['ref'] . '.tar';
-
-                if ($storage->exists($archive) && !$this->option('force')) {
+            foreach ($tools as $code => $values) {
+                if (empty($values['active'])) {
                     continue;
                 }
 
-                $storage->put(
-                    $archive,
-                    Github::api('repo')->contents()->archive(
-                        $values['username'],
-                        $values['repository'],
-                        'tarball',
-                        $values['ref']
-                    )
-                );
+                $flag = 'tools/__installed/' . $code;
+                if (isset($values['ref'])) {
+                    $flag .= '.' . $values['ref'];
+                }
+                if (Storage::exists($flag) && !$this->option('force')) {
+                    continue;
+                }
 
-                $destination = 'tools/' . $code;
-                $storage->deleteDirectory($destination);
-                $storage->makeDirectory($destination);
+                $downloader->download($values, 'tools/' . $code);
 
-                $command = sprintf(
-                    "tar -xf %s --directory %s --strip-components=1",
-                    storage_path("app/{$archive}"),
-                    storage_path("app/{$destination}")
-                );
-                Terminal::exec($command);
-            }
+                if (!empty($values['postinstall'])) {
+                    foreach ($values['postinstall'] as $command) {
+                        Terminal::exec($command);
+                    }
+                }
 
-            if (empty($values['postinstall']) ||
-                (isset($values['bin']) &&
-                $storage->exists($values['bin']) &&
-                !$this->option('force'))
-            ) {
-                continue;
-            }
-
-            foreach ($values['postinstall'] as $command) {
-                Terminal::exec($command);
+                if (!Storage::exists($flag)) {
+                    Storage::put($flag, Carbon::now()->toDateTimeString());
+                }
             }
         }
     }
