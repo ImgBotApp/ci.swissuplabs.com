@@ -25,11 +25,10 @@ class CriticalCssController extends Controller
         ]);
 
         $command = sprintf(
-            "node %s/%s %s -m -b %s",
-            App::basePath(),
-            self::CRITICAL_CLI_PATH,
+            "node %s %s -m -b %s --timeout 60000"
+            App::basePath() . '/' . self::CRITICAL_CLI_PATH,
             escapeshellarg($request->input('website')),
-            App::basePath() . '/storage/app'
+            storage_path('app')
         );
         $process = new Process($command);
         $process->run();
