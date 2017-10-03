@@ -30,6 +30,7 @@ class Phpcpd extends Test
             )
         ]);
         $output = Terminal::exec($command);
+        $output = str_replace(storage_path(), '', $output);
         $fingerprint = '0.00% duplicated lines out of';
         return false !== strstr($output, $fingerprint) ? '' : $output;
     }
