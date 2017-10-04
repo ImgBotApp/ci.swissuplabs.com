@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App;
 use Activity;
-use App\Lib\Github;
+use App\PushEvent;
 use App\Lib\Terminal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -21,97 +21,19 @@ class ValidateGithubCommit implements ShouldQueue
     const ERROR     = 'error';
     const FAILURE   = 'failure';
 
-    protected $payload;
-
-    protected $repositoryType;
+    /**
+     * @var PushEvent
+     */
+    protected $pushEvent;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($payload)
+    public function __construct(PushEvent $pushEvent)
     {
-        $this->payload = $payload;
-    }
-
-    /**
-     * Retrieve repo name
-     *
-     * @return string
-     */
-    private function getRepositoryOwnerName()
-    {
-        return array_get($this->payload, 'repository.owner.name');
-    }
-
-    /**
-     * Retrieve repo name
-     *
-     * @return string
-     */
-    private function getRepositoryName()
-    {
-        return array_get($this->payload, 'repository.name');
-    }
-
-    /**
-     * Retrieve repo full name
-     *
-     * @return string
-     */
-    private function getRepositoryFullName()
-    {
-        return array_get($this->payload, 'repository.full_name');
-    }
-
-    /**
-     * Retrieve commit sha
-     *
-     * @return string
-     */
-    private function getSha()
-    {
-        return array_get($this->payload, 'head_commit.id');
-    }
-
-    /**
-     * Read package type from composer.json
-     *
-     * @return string|false
-     */
-    private function getRepositoryType()
-    {
-        if (null !== $this->repositoryType) {
-            return $this->repositoryType;
-        }
-
-        $this->repositoryType = false;
-
-        try {
-            $fileInfo = Github::api('repo')->contents()->show(
-                $this->getRepositoryOwnerName(),
-                $this->getRepositoryName(),
-                'composer.json',
-                $this->getSha()
-            );
-
-            $json = json_decode(base64_decode($fileInfo['content']), true);
-
-            if (!$json) {
-                $this->createCommitStatus(self::ERROR, 'Error in composer.json file');
-            }
-
-            if (isset($json['type'])) {
-                $this->repositoryType = $json['type'];
-            }
-
-        } catch (\Exception $e) {
-            // composer.json file not found
-            return false;
-        }
-
-        return $this->repositoryType;
+        $this->pushEvent = $pushEvent;
     }
 
     /**
@@ -121,7 +43,7 @@ class ValidateGithubCommit implements ShouldQueue
      */
     public function handle()
     {
-        $type = $this->getRepositoryType();
+        $type = $this->pushEvent->getRepositoryType();
         if (!in_array($type, $this->getSupportedRepositoryTypes())) {
             return;
         }
@@ -144,7 +66,7 @@ class ValidateGithubCommit implements ShouldQueue
                 count($result)
             );
 
-            $this->createCommitStatus(
+            $this->pushEvent->createCommitStatus(
                 $status,
                 $description,
                 $targetUrl
@@ -152,7 +74,7 @@ class ValidateGithubCommit implements ShouldQueue
 
         } catch (\Exception $e) {
             Activity::log('ValidateGithubCommit: Failure. ' . $e->getMessage());
-            $this->createCommitStatus(self::FAILURE, 'Internal server error');
+            $this->pushEvent->createCommitStatus(self::FAILURE, 'Internal server error');
         }
     }
 
@@ -167,29 +89,6 @@ class ValidateGithubCommit implements ShouldQueue
     }
 
     /**
-     * Create commit status at github.com
-     *
-     * @param  string $state
-     * @param  string $description
-     * @param  string $targetUrl
-     * @return void
-     */
-    private function createCommitStatus($state, $description, $targetUrl = '')
-    {
-        Github::api('repo')->statuses()->create(
-            $this->getRepositoryOwnerName(),
-            $this->getRepositoryName(),
-            $this->getSha(),
-            [
-                'state'       => $state,
-                'description' => $description,
-                'target_url'  => $targetUrl,
-                'context'     => 'continuous-integration/ci.swissuplabs.com'
-            ]
-        );
-    }
-
-    /**
      * Save rendered result into public folder
      *
      * @param  array $text  result of runTests method
@@ -197,8 +96,8 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function saveResult($testResults)
     {
-        $sha = $this->getSha();
-        $repository = $this->getRepositoryFullName();
+        $sha = $this->pushEvent->getSha();
+        $repository = $this->pushEvent->getRepositoryFullName();
 
         $data = [
             'sha'        => $sha,
@@ -206,7 +105,7 @@ class ValidateGithubCommit implements ShouldQueue
             'results'    => $testResults,
         ];
 
-        $filePath = 'phpcs/' . $repository . '/' . $this->getSha() . '.html';
+        $filePath = 'phpcs/' . $repository . '/' . $sha . '.html';
         Storage::disk('public')->put(
             $filePath,
             view('github/phpcs', $data)->render()
@@ -223,14 +122,14 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function downloadSources()
     {
-        $repository = $this->getRepositoryFullName();
-        $cloneUrl   = array_get($this->payload, 'repository.clone_url');
+        $repository = $this->pushEvent->getRepositoryFullName();
+        $cloneUrl   = $this->pushEvent->getRepositoryCloneUrl();
         $cloneUrl   = str_replace(
             'https://',
             'https://' . config('github.token') . '@',
             $cloneUrl
         );
-        $ref = array_get($this->payload, 'ref');
+        $ref = $this->pushEvent->getRef();
 
         Storage::disk('local')->makeDirectory($repository);
 
@@ -242,7 +141,7 @@ class ValidateGithubCommit implements ShouldQueue
             'cd ' . $folder,
             'git init',
             'git fetch ' . escapeshellarg($cloneUrl) . ' ' . escapeshellarg($ref),
-            'git checkout ' . escapeshellarg($this->getSha()),
+            'git checkout ' . escapeshellarg($this->pushEvent->getSha()),
         ]);
 
         Terminal::exec($command);
@@ -260,7 +159,7 @@ class ValidateGithubCommit implements ShouldQueue
     {
         $tests = array_merge(
             config('tests.default', []),
-            config('tests.' . $this->getRepositoryType(), [])
+            config('tests.' . $this->pushEvent->getRepositoryType(), [])
         );
 
         $result = [];
@@ -268,8 +167,8 @@ class ValidateGithubCommit implements ShouldQueue
             $class = new $test;
 
             $output = $class
-                ->setPath(storage_path('app/' . $this->getRepositoryFullName()))
-                ->setRepositoryType($this->getRepositoryType())
+                ->setPath(storage_path('app/' . $this->pushEvent->getRepositoryFullName()))
+                ->setRepositoryType($this->pushEvent->getRepositoryType())
                 ->run();
 
             $result[$class->getTitle()] = trim($output);
