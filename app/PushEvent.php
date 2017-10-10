@@ -19,6 +19,16 @@ class PushEvent
     }
 
     /**
+     * Check if event is a tag event
+     *
+     * @return boolean
+     */
+    public function isTag()
+    {
+        return strpos($this->getRef(), 'refs/tags/') === 0;
+    }
+
+    /**
      * Create commit status at github.com
      *
      * @param  string $state
