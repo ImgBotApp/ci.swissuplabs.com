@@ -15,7 +15,7 @@ class Terminal
      */
     public static function exec($command)
     {
-        $process = new Process($command);
+        $process = new Process($command, null, null, null, 600);
         $process->run();
 
         // phpcs uses exit(1) if validation errors where found, so in order
