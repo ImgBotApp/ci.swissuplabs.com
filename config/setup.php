@@ -60,7 +60,28 @@ return [
                         storage_path('app/tools/m2')
                     ),
                 ],
-            ]
+            ],
+
+            /*
+            |------------------------------------------------------------------
+            | Satis
+            |------------------------------------------------------------------
+            | Required by UpdateComposerPackages Job
+            */
+
+            'satis' => [
+                'active' => true,
+                'username' => 'composer',
+                'repository' => 'satis',
+                'ref' => 'master',
+                'postinstall' => [
+                    sprintf(
+                        "cd %s && composer install",
+                        storage_path('app/tools/satis')
+                    ),
+                    'chmod +x ' . storage_path('app/tools/satis/bin/satis')
+                ],
+            ],
 
         ],
 
