@@ -18,6 +18,10 @@ class HookController extends Controller
 
         $pushEvent = new PushEvent($request->getContent());
 
+        if ($pushEvent->isDeleted()) {
+            return;
+        }
+
         if ($pushEvent->isTag()) {
             UpdateComposerPackages::dispatch($pushEvent);
         } else {

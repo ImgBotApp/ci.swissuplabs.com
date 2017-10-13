@@ -29,6 +29,16 @@ class PushEvent
     }
 
     /**
+     * Check if event is a delete event
+     *
+     * @return boolean [description]
+     */
+    public function isDeleted()
+    {
+        return array_get($this->payload, 'deleted');
+    }
+
+    /**
      * Create commit status at github.com
      *
      * @param  string $state
