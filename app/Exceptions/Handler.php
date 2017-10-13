@@ -23,6 +23,11 @@ class Handler extends ExceptionHandler
         \Illuminate\Validation\ValidationException::class,
     ];
 
+    protected $mailReport = [
+        \App\Exceptions\TerminalException::class,
+        \Github\Exception\RuntimeException::class
+    ];
+
     /**
      * Report or log an exception.
      *
@@ -33,7 +38,7 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-        if ($this->shouldReport($exception) && config('app.report_to')) {
+        if ($this->shouldNotify($exception) && config('app.report_to')) {
             Mail::raw($exception->getMessage(), function ($message) {
                 $message
                     ->to(config('app.report_to'))
@@ -42,6 +47,23 @@ class Handler extends ExceptionHandler
         }
 
         parent::report($exception);
+    }
+
+    /**
+     * Determine if the exception should be sent via email.
+     *
+     * @param  Exception $exception
+     * @return bool
+     */
+    public function shouldNotify(Exception $exception)
+    {
+        if (!$this->shouldReport($exception)) {
+            return false;
+        }
+
+        return is_null(collect($this->mailReport)->first(function ($type) use ($exception) {
+            return $exception instanceof $type;
+        }));
     }
 
     /**
