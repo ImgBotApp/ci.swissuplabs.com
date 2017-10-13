@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Pagespeed;
 
 use App;
 use Activity;
+use App\Lib\Terminal;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class CriticalCssController extends Controller
 {
@@ -24,34 +23,24 @@ class CriticalCssController extends Controller
             'website' => 'required|url'
         ]);
 
-        $command = sprintf(
-            "node %s %s -m -b %s --timeout 60000",
-            App::basePath() . '/' . self::CRITICAL_CLI_PATH,
-            escapeshellarg($request->input('website')),
-            storage_path('app')
-        );
-        $process = new Process($command);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            $status = 'Something went wrong.';
-            if (App::environment(['local', 'staging', 'testing'])) {
-                $status = $process->getErrorOutput();
-            }
-
-            Activity::log(sprintf(
-                'CriticalCSS: Failure. Input: %s; Output: %s',
-                $command,
-                $process->getErrorOutput()
+        try {
+            $output = Terminal::exec(sprintf(
+                "node %s %s -m -b %s --timeout 60000",
+                App::basePath() . '/' . self::CRITICAL_CLI_PATH,
+                escapeshellarg($request->input('website')),
+                storage_path('app')
             ));
+        } catch (\Exception $e) {
+            report($e);
 
             return redirect()
                 ->action('Pagespeed\CriticalCssController@index')
-                ->withErrors([$status]);
-        } else {
-            Activity::log('CriticalCSS: Success. ' . $request->input('website'));
+                ->withErrors(['Something went wrong.']);
         }
 
-        return response($process->getOutput(), 200, ['Content-Type' => 'text/plain']);
+        // @todo: replace Activity with plain Log
+        Activity::log('CriticalCSS: Success. ' . $request->input('website'));
+
+        return response($output, 200, ['Content-Type' => 'text/plain']);
     }
 }
