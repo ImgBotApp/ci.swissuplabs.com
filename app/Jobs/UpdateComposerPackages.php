@@ -105,7 +105,7 @@ class UpdateComposerPackages implements ShouldQueue
      * Create and push new commit to the remote reposotory via GitHub API
      *
      * @return $this
-     * @throws \Exception
+     * @throws \Github\Exception\RuntimeException
      */
     protected function push()
     {

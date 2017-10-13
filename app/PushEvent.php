@@ -45,6 +45,7 @@ class PushEvent
      * @param  string $description
      * @param  string $targetUrl
      * @return void
+     * @throws \Github\Exception\RuntimeException
      */
     public function createCommitStatus($state, $description, $targetUrl = '')
     {

@@ -40,6 +40,7 @@ class ValidateGithubCommit implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws \Github\Exception\RuntimeException
      * @throws \Exception
      */
     public function handle()
@@ -73,6 +74,8 @@ class ValidateGithubCommit implements ShouldQueue
                 $targetUrl
             );
 
+        } catch (\Github\Exception\RuntimeException $e) {
+            throw $e;
         } catch (\Exception $e) {
             $this->pushEvent->createCommitStatus(self::FAILURE, 'Internal server error');
             throw $e;
