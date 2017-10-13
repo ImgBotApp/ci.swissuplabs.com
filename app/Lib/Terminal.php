@@ -21,7 +21,7 @@ class Terminal
         // phpcs uses exit(1) if validation errors where found, so in order
         // to detect if it was really a terminal error - checkout error_output too
         if (!$process->isSuccessful() && $process->getErrorOutput()) {
-            throw new \Exception(sprintf(
+            throw new \App\Exceptions\TerminalException(sprintf(
                 'Input: %s; Output: %s',
                 $command,
                 $process->getErrorOutput()

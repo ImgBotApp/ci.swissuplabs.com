@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
@@ -32,6 +33,14 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        if ($this->shouldReport($exception) && config('app.report_to')) {
+            Mail::raw($exception->getMessage(), function ($message) {
+                $message
+                    ->to(config('app.report_to'))
+                    ->subject(config('app.name'));
+            });
+        }
+
         parent::report($exception);
     }
 

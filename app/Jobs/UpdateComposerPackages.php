@@ -52,6 +52,7 @@ class UpdateComposerPackages implements ShouldQueue
      * Run satis build task and push the result to the remote repository
      *
      * @return void
+     * @throws \Exception
      */
     public function handle()
     {
@@ -62,19 +63,14 @@ class UpdateComposerPackages implements ShouldQueue
 
         $this->path = 'satis/' . $this->settings['folder'];
 
-        try {
-            $this->download()
-                ->build()
-                ->push();
-        } catch (\Exception $e) {
-            Activity::log('UpdateComposerPackages: Failure. ' . $e->getMessage());
-        }
+        $this->download()->build()->push();
     }
 
     /**
      * Download satis packages repository
      *
      * @return $this
+     * @throws \App\Exceptions\TerminalException
      */
     protected function download()
     {
@@ -91,6 +87,7 @@ class UpdateComposerPackages implements ShouldQueue
      * Run satis build command inside downloaded repository
      *
      * @return $this
+     * @throws \App\Exceptions\TerminalException
      */
     protected function build()
     {
@@ -108,6 +105,7 @@ class UpdateComposerPackages implements ShouldQueue
      * Create and push new commit to the remote reposotory via GitHub API
      *
      * @return $this
+     * @throws \Exception
      */
     protected function push()
     {
