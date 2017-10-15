@@ -13,6 +13,16 @@ class Test
         return static::class;
     }
 
+    public function canRun()
+    {
+        return false;
+    }
+
+    public function run()
+    {
+        return '';
+    }
+
     public function setPath($path)
     {
         $this->path = $path;

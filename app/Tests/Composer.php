@@ -11,6 +11,14 @@ class Composer extends Test
     }
 
     /**
+     * @return boolean
+     */
+    public function canRun()
+    {
+        return file_exists($this->getPath() . '/composer.json');
+    }
+
+    /**
      * Run the test and return console output.
      * If the test was successfull, result will be an empty string.
      *

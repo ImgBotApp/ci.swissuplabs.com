@@ -45,11 +45,6 @@ class ValidateGithubCommit implements ShouldQueue
      */
     public function handle()
     {
-        $type = $this->pushEvent->getRepositoryType();
-        if (!in_array($type, $this->getSupportedRepositoryTypes())) {
-            return;
-        }
-
         try {
             $status = self::SUCCESS;
             $targetUrl = '';
@@ -92,16 +87,6 @@ class ValidateGithubCommit implements ShouldQueue
             $this->pushEvent->createCommitStatus(self::FAILURE, 'Internal server error');
             throw $e;
         }
-    }
-
-    /**
-     * Get array of supported package types
-     *
-     * @return array
-     */
-    private function getSupportedRepositoryTypes()
-    {
-        return array_keys(config('tests'));
     }
 
     /**
@@ -173,21 +158,19 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function runTests()
     {
-        $tests = array_merge(
-            config('tests.default', []),
-            config('tests.' . $this->pushEvent->getRepositoryType(), [])
-        );
-
         $result = [];
-        foreach ($tests as $test) {
-            $class = new $test;
-
-            $output = $class
+        foreach (config('tests') as $class) {
+            $test = (new $class)
                 ->setPath(storage_path('app/' . $this->pushEvent->getRepositoryFullName()))
-                ->setRepositoryType($this->pushEvent->getRepositoryType())
-                ->run();
+                ->setRepositoryType($this->pushEvent->getRepositoryType());
 
-            $result[$class->getTitle()] = trim($output);
+            if (!$test->canRun()) {
+                continue;
+            }
+
+            $output = $test->run();
+
+            $result[$test->getTitle()] = trim($output);
         }
         return $result;
     }
