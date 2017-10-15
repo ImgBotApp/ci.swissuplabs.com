@@ -121,10 +121,10 @@ class ValidateGithubCommit implements ShouldQueue
             'results'    => $testResults,
         ];
 
-        $filePath = 'phpcs/' . $repository . '/' . $sha . '.html';
+        $filePath = 'tests/' . $repository . '/' . $sha . '.html';
         Storage::disk('public')->put(
             $filePath,
-            view('github/phpcs', $data)->render()
+            view('github/tests', $data)->render()
         );
 
         return asset(Storage::disk('public')->url($filePath));
