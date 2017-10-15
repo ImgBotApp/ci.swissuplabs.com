@@ -63,6 +63,46 @@ class PushEvent
     }
 
     /**
+     * Get commit status at github.com for previous commit
+     *
+     * @return string
+     * @throws \Github\Exception\RuntimeException
+     */
+    public function getPreviousCommitStatus()
+    {
+        $statuses = Github::api('repo')->statuses()->show(
+            $this->getRepositoryOwnerName(),
+            $this->getRepositoryName(),
+            array_get($this->payload, 'before')
+        );
+
+        if (!count($statuses)) {
+            return false;
+        }
+
+        return $statuses[0]['state'];
+    }
+
+    /**
+     * Create commit comment at github.com
+     *
+     * @param  string $comment
+     * @return void
+     * @throws \Github\Exception\RuntimeException
+     */
+    public function createCommitComment($comment)
+    {
+        Github::api('repo')->comments()->create(
+            $this->getRepositoryOwnerName(),
+            $this->getRepositoryName(),
+            $this->getSha(),
+            [
+                'body' => $comment
+            ]
+        );
+    }
+
+    /**
      * Retrieve repo name
      *
      * @return string
@@ -116,6 +156,16 @@ class PushEvent
     public function getSha()
     {
         return array_get($this->payload, 'head_commit.id');
+    }
+
+    /**
+     * Retrieve compare url
+     *
+     * @return string
+     */
+    public function getCompareUrl()
+    {
+        return array_get($this->payload, 'compare');
     }
 
     /**

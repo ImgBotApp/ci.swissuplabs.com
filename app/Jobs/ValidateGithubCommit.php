@@ -74,6 +74,18 @@ class ValidateGithubCommit implements ShouldQueue
                 $targetUrl
             );
 
+            // Send notification if previous commit passed all tests only
+            if ($status !== self::SUCCESS &&
+                $this->pushEvent->getPreviousCommitStatus() === self::SUCCESS) {
+
+                $compareUrl = $this->pushEvent->getCompareUrl();
+                $this->pushEvent->createCommitComment(sprintf(
+                    "Please verify your [commit](%s) as it didn't pass [some tests](%s)",
+                    $compareUrl,
+                    $targetUrl
+                ));
+            }
+
         } catch (\Github\Exception\RuntimeException $e) {
             throw $e;
         } catch (\Exception $e) {
