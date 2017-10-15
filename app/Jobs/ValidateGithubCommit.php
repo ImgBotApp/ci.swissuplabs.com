@@ -153,7 +153,7 @@ class ValidateGithubCommit implements ShouldQueue
     /**
      * Run tests against downloaded sources
      *
-     * @return string       Error messages
+     * @return array        [Test Title => Error string] pairs
      * @throws \Exception
      */
     private function runTests()
