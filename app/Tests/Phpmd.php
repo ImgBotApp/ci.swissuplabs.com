@@ -29,8 +29,6 @@ class Phpmd extends Test
                 storage_path('app/tools/m2/dev/tests/static/testsuite/Magento/Test/Php/_files/phpmd/ruleset.xml')
             )
         ]);
-        $output = Terminal::exec($command);
-        $output = str_replace(storage_path(), '', $output);
-        return $output;
+        return Terminal::exec($command);
     }
 }

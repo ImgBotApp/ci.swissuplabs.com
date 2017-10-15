@@ -159,6 +159,7 @@ class ValidateGithubCommit implements ShouldQueue
     private function runTests()
     {
         $result = [];
+
         foreach (config('tests') as $class) {
             $test = (new $class)
                 ->setPath(storage_path('app/' . $this->pushEvent->getRepositoryFullName()))
@@ -169,9 +170,10 @@ class ValidateGithubCommit implements ShouldQueue
             }
 
             $output = $test->run();
-
+            $output = str_replace(storage_path(), '', $output);
             $result[$test->getTitle()] = trim($output);
         }
+
         return $result;
     }
 }

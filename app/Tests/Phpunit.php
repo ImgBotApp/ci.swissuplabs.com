@@ -64,7 +64,6 @@ class Phpunit extends Test
         ]);
 
         $output = Terminal::exec($command);
-        $output = str_replace(storage_path(), '', $output);
 
         $fingerprint = 'FAILURES!';
         return false === strstr($output, $fingerprint) ? '' : $output;
