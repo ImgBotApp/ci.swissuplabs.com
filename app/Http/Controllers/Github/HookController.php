@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Github;
 
 use App\PushEvent;
 use Illuminate\Http\Request;
+use App\Jobs\DebouncedJob;
 use App\Jobs\ValidateGithubCommit;
 use App\Jobs\UpdateComposerPackages;
 use App\Http\Controllers\Controller;
@@ -23,7 +24,7 @@ class HookController extends Controller
         }
 
         if ($pushEvent->isTag()) {
-            UpdateComposerPackages::dispatch($pushEvent);
+            DebouncedJob::dispatch(new UpdateComposerPackages($pushEvent), 10);
         } else {
             ValidateGithubCommit::dispatch($pushEvent);
         }
