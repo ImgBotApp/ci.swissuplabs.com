@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use Activity;
 use App\PushEvent;
 use App\Lib\Github;
 use App\Lib\Terminal;
