@@ -149,7 +149,7 @@ return [
 
             'phpunit' => [
                 'active' => true,
-                'url' => 'https://phar.phpunit.de/phpunit.phar',
+                'url' => 'https://phar.phpunit.de/phpunit-5.7.phar',
                 'postinstall' => [
                     'chmod +x ' . storage_path('app/tools/phpunit')
                 ]
