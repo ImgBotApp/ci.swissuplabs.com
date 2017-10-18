@@ -32,13 +32,21 @@ class Phpcpd extends Test
         $command = implode(' && ', [
             sprintf(
                 // "%s --fuzzy -vvv --min-lines=3 --min-tokens=30 %s",
-                "%s --exclude=sql --regexps-exclude '~Setup~' --fuzzy -vvv %s",
+                "%s --regexps-exclude '~Setup~,~lib~,~sql~' --fuzzy -vvv %s",
                 storage_path('app/tools/phpcpd'),
                 escapeshellarg($this->getPath())
             )
         ]);
         $output = Terminal::exec($command);
-        $fingerprint = '0.00% duplicated lines out of';
-        return false !== strstr($output, $fingerprint) ? '' : $output;
+        $fingerprints = array(
+            '0.00% duplicated lines out of',
+            'No files found to scan'
+        );
+        foreach ($fingerprints as $fingerprint) {
+            if (false !== strstr($output, $fingerprint)) {
+                $output = '';
+            }
+        }
+        return $output;
     }
 }
