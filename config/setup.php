@@ -141,6 +141,20 @@ return [
                 ]
             ],
 
+            /*
+            |------------------------------------------------------------------
+            | Php unit
+            |------------------------------------------------------------------
+            */
+
+            'phpunit' => [
+                'active' => true,
+                'url' => 'https://phar.phpunit.de/phpunit.phar',
+                'postinstall' => [
+                    'chmod +x ' . storage_path('app/tools/phpunit')
+                ]
+            ],
+
         ],
 
     ],
