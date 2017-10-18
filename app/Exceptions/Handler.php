@@ -61,7 +61,7 @@ class Handler extends ExceptionHandler
             return false;
         }
 
-        return is_null(collect($this->mailReport)->first(function ($type) use ($exception) {
+        return !is_null(collect($this->mailReport)->first(function ($type) use ($exception) {
             return $exception instanceof $type;
         }));
     }
