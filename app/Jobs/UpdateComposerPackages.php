@@ -98,8 +98,11 @@ class UpdateComposerPackages implements ShouldQueue
     protected function build()
     {
         $command = implode(' && ', [
-            'cd ' . storage_path("app/{$this->path}"),
-            sprintf("%s/satis build satis.json .", storage_path('app/tools/satis/bin'))
+            sprintf(
+                "%s/satis build --no-interaction satis.json %s",
+                storage_path("app/tools/satis/bin"),
+                storage_path("app/{$this->path}")
+            )
         ]);
 
         Terminal::exec($command);
