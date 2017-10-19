@@ -22,7 +22,7 @@ class UpdateComposerPackages implements ShouldQueue
      *
      * @var int
      */
-    public $tries = 5;
+    public $tries = 2;
 
     /**
      * @var PushEvent
