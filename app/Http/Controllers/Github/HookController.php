@@ -24,7 +24,7 @@ class HookController extends Controller
         }
 
         if ($pushEvent->isTag()) {
-            DebouncedJob::dispatch(new UpdateComposerPackages($pushEvent), 10);
+            DebouncedJob::dispatch(new UpdateComposerPackages($pushEvent), 600);
         } else {
             ValidateGithubCommit::dispatch($pushEvent);
         }
