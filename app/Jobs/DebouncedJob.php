@@ -44,10 +44,8 @@ class DebouncedJob implements ShouldQueue
         $this->debounced = serialize($job);
         $this->wait = $wait;
 
-        if (config('queue.default') !== 'sync') {
-            $this->saveCurrentTime();
-            $this->delay($this->wait);
-        }
+        $this->saveCurrentTime();
+        $this->delay($this->wait);
     }
 
     public function handle()
@@ -68,11 +66,15 @@ class DebouncedJob implements ShouldQueue
      */
     protected function canHandle()
     {
+        if (config('queue.default') === 'sync') {
+            return true;
+        }
+
         $now = time();
 
         $lastCall = cache()->get($this->getCacheKey());
 
-        return !$lastCall || $now >= $lastCall;
+        return $lastCall && $now >= $lastCall;
     }
 
     /**
