@@ -99,8 +99,9 @@ class UpdateComposerPackages implements ShouldQueue
     {
         $command = implode(' && ', [
             sprintf(
-                "%s/satis build --no-interaction satis.json %s",
+                "%s/satis build --no-interaction %s/satis.json %s",
                 storage_path("app/tools/satis/bin"),
+                storage_path("app/{$this->path}"),
                 storage_path("app/{$this->path}")
             )
         ]);
