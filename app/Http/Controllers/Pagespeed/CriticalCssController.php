@@ -6,6 +6,7 @@ use App;
 use Activity;
 use App\Lib\Terminal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
 class CriticalCssController extends Controller
@@ -31,7 +32,8 @@ class CriticalCssController extends Controller
                 storage_path('app')
             ));
         } catch (\Exception $e) {
-            report($e);
+            Log::error($e->getMessage());
+            // report($e); wait for laravel 5.5
 
             return redirect()
                 ->action('Pagespeed\CriticalCssController@index')
