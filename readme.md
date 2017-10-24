@@ -9,28 +9,38 @@
 
 ## Installation
 
-```bash
-# 1. fetch the sources
-git clone git@github.com:swissup/ci.swissuplabs.com.git && cd ci.swissuplabs.com
+ 1. Get webhook secret and access token from github
+ 2. Prepare Application
 
-# 2. install php dependencies
-composer install
+    ```bash
+    # 1. fetch the sources
+    git clone git@github.com:swissup/ci.swissuplabs.com.git && cd ci.swissuplabs.com
 
-# 3. prepare laravel application
-cp .env.example .env
-find storage bootstrap -type d -exec chmod 777 {} +
-php artisan key:generate
-php artisan migrate
-php artisan storage:link
-# Setup GitHub webhook secret and access token. Download test tools and prepare environment
-php artisan app:setup
+    # 2. install php dependencies
+    composer install
 
-# 4. install npm modules (omit `--production` key if you are frontend developer)
-npm install --production
+    # 3. prepare files and folders
+    find storage bootstrap -type d -exec chmod 777 {} +
+    php artisan storage:link
 
-# 5. run the site (skip this step if you have a ready to use webserver)
-php artisan serve
-```
+    # 4. prepare configuration
+    cp .env.example .env
+    php artisan key:generate
+    vi .env
+
+    # 5. setup application dependencies
+    php artisan migrate
+    php artisan app:setup
+
+    # 6. install npm modules (omit `--production` key if you are frontend developer)
+    npm install --production
+
+    # 7. run the site (skip this step if you have a ready to use webserver)
+    php artisan serve
+    ```
+
+ 3. [Configure crontab](#configure-crontab)
+ 4. [Configure supervisor](#configure-supervisor)
 
 ## Upgrade
 
@@ -43,39 +53,50 @@ php artisan app:setup
 php artisan queue:restart
 ```
 
-## Configuring Supervisor
+## Configure Crontab
+
+ 1. Run this command to open editor:
+
+    ```bash
+    crontab -e
+    ```
+
+ 2. Add the following line:
+
+    ```bash
+    * * * * * php /path-to-your-project/artisan schedule:run >> /dev/null 2>&1
+    ```
+
+## Configure Supervisor
 
 If you would like to use database driver to process queue jobs, you need to
 configure supervisor.
 
-Supervisor is a process monitor for the Linux operating system, and will
-automatically restart your `queue:work` process if it fails.
+1. Generate config using `echo_supervisord_conf` script:
 
-Generate config using `echo_supervisord_conf` script:
+    ```bash
+    echo_supervisord_conf > /path-to-your-project/supervisord.conf
+    ```
 
-```bash
-echo_supervisord_conf > /home/www/ci.swissuplabs.com/supervisord.conf
-```
+ 2. Add new section into it:
 
-Add new section into it:
+    ```ini
+    [program:ci.swissuplabs.com]
+    process_name=%(program_name)s_%(process_num)02d
+    command=php /path-to-your-project/artisan queue:work
+    autostart=true
+    autorestart=true
+    user=swissuplabs
+    numprocs=2
+    redirect_stderr=true
+    stdout_logfile=/path-to-your-project/worker.log
+    ```
 
-```ini
-[program:ci.swissuplabs.com]
-process_name=%(program_name)s_%(process_num)02d
-command=php /home/www/ci.swissuplabs.com/artisan queue:work
-autostart=true
-autorestart=true
-user=swissuplabs
-numprocs=2
-redirect_stderr=true
-stdout_logfile=/home/www/ci.swissuplabs.com/worker.log
-```
+ 3. Start supervisor:
 
-Start supervisor:
-
-```bash
-supervisord -c /home/www/ci.swissuplabs.com/supervisord.conf
-supervisorctl reread
-supervisorctl update
-supervisorctl start ci.swissuplabs.com:*
-```
+    ```bash
+    supervisord -c /path-to-your-project/supervisord.conf
+    supervisorctl reread
+    supervisorctl update
+    supervisorctl start ci.swissuplabs.com:*
+    ```
