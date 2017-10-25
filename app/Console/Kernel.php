@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\SetupApplication::class,
+        \App\Console\Commands\UpdateApplication::class,
         \App\Console\Commands\ComposerConfig::class,
     ];
 
