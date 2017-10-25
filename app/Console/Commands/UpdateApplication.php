@@ -54,10 +54,8 @@ class UpdateApplication extends Command
             'php artisan up',
         ]);
 
-        try {
-            $this->info(Terminal::exec($command));
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        Terminal::exec($command);
+
+        $this->info('Done');
     }
 }
