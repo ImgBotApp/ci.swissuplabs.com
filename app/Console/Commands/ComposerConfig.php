@@ -40,7 +40,11 @@ class ComposerConfig extends Command
     {
         $command = 'composer config -g github-oauth.github.com';
 
-        $output = Terminal::exec($command);
+        try {
+            $output = Terminal::exec($command);
+        } catch (\App\Exceptions\TerminalException $e) {
+            $output = $e->getMessage();
+        }
 
         if (strpos($output, 'github-oauth.github.com is not defined') !== false) {
             Terminal::exec($command . ' ' . config('github.token'));
