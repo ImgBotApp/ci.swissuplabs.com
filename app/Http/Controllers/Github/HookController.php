@@ -19,7 +19,7 @@ class HookController extends Controller
 
         $pushEvent = new PushEvent($request->getContent());
 
-        if ($pushEvent->isDeleted()) {
+        if (!$this->canHandle($pushEvent)) {
             return;
         }
 
@@ -28,5 +28,18 @@ class HookController extends Controller
         } else {
             ValidateGithubCommit::dispatch($pushEvent);
         }
+    }
+
+    /**
+     * Check if we should handle request
+     *
+     * @return boolean
+     */
+    protected function canHandle(PushEvent $pushEvent)
+    {
+        $ignored = config('repositories.ignore');
+
+        return !$pushEvent->isDeleted()
+            && !in_array($pushEvent->getRepositoryFullName(), $ignored);
     }
 }
