@@ -6,6 +6,7 @@ use App;
 use Activity;
 use App\PushEvent;
 use App\Lib\Terminal;
+use App\Downloader\Github as GithubDownloader;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
@@ -56,7 +57,9 @@ class ValidateGithubCommit implements ShouldQueue
             $status = self::SUCCESS;
             $targetUrl = '';
 
-            $result = $this->downloadSources()->runTests();
+            $this->downloadSources();
+            $result = $this->runTests();
+            $this->removeSources();
 
             $failedTests = array_filter($result);
             if ($failedTests) {
@@ -130,29 +133,25 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function downloadSources()
     {
-        $repository = $this->pushEvent->getRepositoryFullName();
-        $cloneUrl   = $this->pushEvent->getRepositoryCloneUrl();
-        $cloneUrl   = str_replace(
-            'https://',
-            'https://' . config('github.token') . '@',
-            $cloneUrl
-        );
-        $ref = $this->pushEvent->getRef();
+        $downloader = new GithubDownloader;
+        $downloader->download([
+            'username'   => $this->pushEvent->getRepositoryOwnerName(),
+            'repository' => $this->pushEvent->getRepositoryName(),
+            'ref'        => $this->pushEvent->getRef()
+        ], $this->pushEvent->getRepositoryFullName());
 
-        Storage::disk('local')->makeDirectory($repository);
+        return $this;
+    }
 
-        // @todo: replace this code with archive download
-        // in case of slow git fetch command
-        // @see https://developer.github.com/v3/repos/contents/#get-archive-link
-        $folder = escapeshellarg(storage_path('app/' . $repository));
-        $command = implode(' && ', [
-            'cd ' . $folder,
-            'git init',
-            'git fetch ' . escapeshellarg($cloneUrl) . ' ' . escapeshellarg($ref),
-            'git checkout ' . escapeshellarg($this->pushEvent->getSha()),
-        ]);
-
-        Terminal::exec($command);
+    /**
+     * Remove module sources from 'storage/app' folder
+     *
+     * @return $this
+     * @throws \Exception
+     */
+    private function removeSources()
+    {
+        Storage::deleteDirectory($this->pushEvent->getRepositoryFullName());
 
         return $this;
     }
