@@ -9,7 +9,10 @@ return [
         ],
         'github.token' => [
             'env_key' => 'GITHUB_TOKEN',
-            'prompt'  => 'Enter github token'
+            'prompt'  => 'Enter github token',
+            'postinstall' => [
+                'composer:config'
+            ]
         ],
     ],
 

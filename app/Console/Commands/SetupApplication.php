@@ -118,6 +118,12 @@ class SetupApplication extends Command
 
             $this->laravel['config'][$key] = $input;
 
+            if (!empty($values['postinstall'])) {
+                foreach ($values['postinstall'] as $command) {
+                    $this->callSilent($command);
+                }
+            }
+
             $this->info("Done.");
         }
     }
