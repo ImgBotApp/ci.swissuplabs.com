@@ -45,12 +45,21 @@
 ## Upgrade
 
 ```bash
+# use artisan command
+php artisan app:update
+
+# or manually
+php artisan down
 git pull
 composer install
-php artisan migrate
+php artisan config:clear
+php artisan view:clear
 php artisan cache:clear
+php artisan migrate --force
 php artisan app:setup
+php artisan config:cache
 php artisan queue:restart
+php artisan up
 ```
 
 ## Configure Crontab
