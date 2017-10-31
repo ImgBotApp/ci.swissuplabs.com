@@ -27,24 +27,31 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            $log = storage_path('logs/laravel.log');
-            if (file_exists($log)) {
-                $text = 'Daily laravel.log report';
-            } else {
-                $text = 'Everything works fine';
-            }
-            Mail::raw($text, function ($message) use ($log) {
-                $message
-                    ->to(config('app.report_to'))
-                    ->subject('Daily report from ' . config('app.name'));
-
+        $schedule
+            ->call(function () {
+                $log = storage_path('logs/laravel.log');
                 if (file_exists($log)) {
-                    $message->attach($log);
+                    $text = 'Daily laravel.log report';
+                } else {
+                    $text = 'Everything works fine';
+                }
+                Mail::raw($text, function ($message) use ($log) {
+                    $message
+                        ->to(config('app.report_to'))
+                        ->subject('Daily report from ' . config('app.name'));
+
+                    if (file_exists($log)) {
+                        $message->attach($log);
+                    }
+                });
+            })
+            ->daily()
+            ->after(function () {
+                $log = storage_path('logs/laravel.log');
+                if (file_exists($log)) {
                     unlink($log);
                 }
             });
-        })->daily();
     }
 
     /**
