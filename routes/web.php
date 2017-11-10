@@ -16,4 +16,5 @@ Route::get('/', function () {
 });
 
 Route::get('pagespeed/critical-css', 'Pagespeed\CriticalCssController@index');
-Route::get('pagespeed/critical-css/generate', 'Pagespeed\CriticalCssController@generate');
+Route::get('pagespeed/critical-css/generate', 'Pagespeed\CriticalCssController@generate')
+    ->middleware('throttle:1,1');
