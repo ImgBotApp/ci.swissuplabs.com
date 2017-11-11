@@ -179,6 +179,7 @@ return [
          * Third-party providers
          */
         Spatie\Activitylog\ActivitylogServiceProvider::class,
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
         /*
          * Application Service Providers...
