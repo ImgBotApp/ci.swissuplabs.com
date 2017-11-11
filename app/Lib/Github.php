@@ -4,19 +4,24 @@ namespace App\Lib;
 
 use Github\Client;
 
+/**
+ * @method static api(string $name) {
+ *      @return \Github\Api\ApiInterface
+ * }
+ */
 class Github
 {
     /**
      * The current globally used GitHub connection.
      *
-     * @var object
+     * @var Client
      */
     protected static $client;
 
     /**
      * Set the globally available instance of the Github\Client connection.
      *
-     * @return static
+     * @return Client
      */
     public static function client()
     {
