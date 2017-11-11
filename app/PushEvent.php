@@ -192,7 +192,7 @@ class PushEvent
             $json = json_decode(base64_decode($fileInfo['content']), true);
 
             if (!$json) {
-                $this->createCommitStatus(self::ERROR, 'Error in composer.json file');
+                $this->createCommitStatus('error', 'Error in composer.json file');
             }
 
             if (isset($json['type'])) {
