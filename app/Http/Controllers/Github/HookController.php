@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Github;
 
 use App\PushEvent;
+use App\EventRepository;
 use Illuminate\Http\Request;
 use App\Jobs\DebouncedJob;
 use App\Jobs\ValidateGithubCommit;
@@ -28,6 +29,8 @@ class HookController extends Controller
         } else {
             ValidateGithubCommit::dispatch($pushEvent);
         }
+
+        EventRepository::add($pushEvent);
     }
 
     /**
