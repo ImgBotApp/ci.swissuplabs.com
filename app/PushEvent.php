@@ -143,6 +143,14 @@ class PushEvent
     /**
      * @return string
      */
+    public function getRepositoryUrl()
+    {
+        return array_get($this->payload, 'repository.url');
+    }
+
+    /**
+     * @return string
+     */
     public function getRef()
     {
         return array_get($this->payload, 'ref');
@@ -205,5 +213,26 @@ class PushEvent
         }
 
         return $this->repositoryType;
+    }
+
+    public function getTagName()
+    {
+        if (!$this->isTag()) {
+            return null;
+        }
+
+        return str_replace('refs/tags/', '', $this->getRef());
+    }
+
+    /**
+     * Retrieve any parameter from payload data
+     *
+     * @param $key
+     * @param null $default
+     * @return mixed
+     */
+    public function getData($key, $default = null)
+    {
+        return array_get($this->payload, $key, $default);
     }
 }
