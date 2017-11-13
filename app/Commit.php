@@ -28,4 +28,12 @@ class Commit extends Model
     protected $casts = [
         'data' => 'array',
     ];
+
+    /**
+     * Get the repository that owns the commit.
+     */
+    public function repository()
+    {
+        return $this->belongsTo('App\Repository');
+    }
 }
