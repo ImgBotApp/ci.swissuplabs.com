@@ -48,10 +48,10 @@
                 <tr>
                     <td>{{ $repository->owner }} / {{ $repository->name }}</td>
                     <td>
-                        <a href="#" data-component="dropdown" data-target="#{{ $repository->owner }}_{{ $repository->name }}">
+                        <a href="#" data-component="dropdown" data-target="#project-{{ $repository->id }}">
                             {{ \Carbon\Carbon::parse($repository->commits[0]->created_at)->diffForHumans() }}<span class="caret down"></span>
                         </a>
-                        <div class="dropdown hide p2" id="{{ $repository->owner }}_{{ $repository->name }}">
+                        <div class="dropdown hide p2" id="project-{{ $repository->id }}">
                             <a href="" class="close show-sm"></a>
                             <h6 class="mb1">Recent activities:</h6>
                             <ul>
