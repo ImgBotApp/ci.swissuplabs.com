@@ -15,6 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard', 'DashboardController@activity');
+Route::get('/dashboard/activity', 'DashboardController@activity');
+
 Route::get('pagespeed/critical-css', 'Pagespeed\CriticalCssController@index');
 Route::get('pagespeed/critical-css/generate', 'Pagespeed\CriticalCssController@generate')
     ->middleware('throttle:1,1');

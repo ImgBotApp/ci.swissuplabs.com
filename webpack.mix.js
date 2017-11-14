@@ -23,3 +23,9 @@ mix.sass('resources/assets/sass/app.scss', 'public/css')
             })
         ]
    });
+
+mix.scripts([
+    'node_modules/jquery/dist/jquery.min.js',
+    'node_modules/imperavi-kube/dist/js/kube.min.js',
+    'resources/asssets/js/app.js'
+], 'public/js/app.js').version();

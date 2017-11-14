@@ -26,4 +26,12 @@ class Repository extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * Get the commits for the repository.
+     */
+    public function commits()
+    {
+        return $this->hasMany('App\Commit');
+    }
 }

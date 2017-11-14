@@ -22,7 +22,7 @@
 
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
-                    <div class="message error w50 w100-sm push-center" data-component="message">
+                    <div class="message error w70 w100-sm push-center" data-component="message">
                         {{ $error }}
                     </div>
                 @endforeach
@@ -35,7 +35,7 @@
                         team for <a href="https://docs.swissuplabs.com/m1/extensions/pagespeed/" title="Pagespeed module for Magento">pagespeed</a>
                         users.
                     </div>
-                    <div class="append w50 w100-sm push-center">
+                    <div class="append w70 w100-sm push-center">
                         <input type="url" name="website" placeholder="https://example.com" required/>
                         <button id="submit" class="button outline" type="submit">Generate</button>
                     </div>
