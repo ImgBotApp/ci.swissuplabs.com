@@ -32,6 +32,6 @@ class Repository extends Model
      */
     public function commits()
     {
-        return $this->hasMany('App\Commit')->latest();
+        return $this->hasMany('App\Commit');
     }
 }

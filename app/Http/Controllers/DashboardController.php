@@ -14,15 +14,26 @@ class DashboardController extends Controller
 
     public function activity()
     {
-        $repositories = App\Repository::whereHas('commits', function ($query) {
-            $query->where('created_at', '>', Carbon::now()->subDays(3));
-        })->with(['commits' => function ($query) {
-            $query->where('created_at', '>', Carbon::now()->subDays(3));
-        }])->get();
+        $activitySince = Carbon::now()->subDays(2);
 
-        $repositories = App\Repository::with(['commits' => function ($query) {
-            $query->latest();
-        }])->get();
+        $repositories = App\Repository::whereHas(
+                'commits', function ($query) use ($activitySince) {
+                    $query->where('created_at', '>', $activitySince);
+                }
+            )
+            ->with([
+                'commits' => function ($query) use ($activitySince) {
+                    $query->where('created_at', '>', $activitySince)->latest();
+                }
+            ])
+            ->get()
+            ->map(function ($repository) {
+                $repository->setRelation('commits', $repository->commits->take(3));
+                return $repository;
+            })
+            ->sortByDesc(function ($repository) {
+                return $repository->commits[0]->created_at;
+            });
 
         return view('dashboard', [
             'repositories' => $repositories
