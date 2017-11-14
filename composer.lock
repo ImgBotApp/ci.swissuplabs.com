@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "62bb0d52290e42c1ae4f561ad84ee96e",
-    "content-hash": "4a98b25aa61b0465ce4e3a774483dfdb",
+    "hash": "f83c1974cf6ccdedee7e119668d67209",
+    "content-hash": "f397e6dea562a6acc01111aac7016877",
     "packages": [
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -503,6 +503,64 @@
                 "url"
             ],
             "time": "2017-03-20 17:10:46"
+        },
+        {
+            "name": "itsgoingd/clockwork",
+            "version": "v2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/itsgoingd/clockwork.git",
+                "reference": "f83dd1a5cb190a977f27b05c52b1bdc298344eb5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/itsgoingd/clockwork/zipball/f83dd1a5cb190a977f27b05c52b1bdc298344eb5",
+                "reference": "f83dd1a5cb190a977f27b05c52b1bdc298344eb5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4",
+                "psr/log": "1.*"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Clockwork\\Support\\Laravel\\ClockworkServiceProvider"
+                    ],
+                    "aliases": {
+                        "Clockwork": "Clockwork\\Support\\Laravel\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Clockwork\\": "Clockwork/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "itsgoingd",
+                    "email": "itsgoingd@luzer.sk",
+                    "homepage": "https://twitter.com/itsgoingd"
+                }
+            ],
+            "description": "php dev tools integrated to your browser",
+            "homepage": "https://underground.works/clockwork",
+            "keywords": [
+                "Devtools",
+                "debugging",
+                "laravel",
+                "logging",
+                "lumen",
+                "profiling",
+                "slim"
+            ],
+            "time": "2017-10-05 16:11:57"
         },
         {
             "name": "jakub-onderka/php-console-color",
