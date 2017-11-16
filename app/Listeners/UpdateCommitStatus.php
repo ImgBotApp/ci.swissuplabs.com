@@ -15,10 +15,8 @@ class UpdateCommitStatus
      */
     public function handle(PushValidated $event)
     {
-        Commit::where('sha', $event->push->getSha())
-            ->first()
-            ->update([
-                'status' => $event->status
-            ]);
+        Commit::where('sha', $event->push->getSha())->update([
+            'status' => $event->status
+        ]);
     }
 }
