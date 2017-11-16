@@ -24,10 +24,11 @@ class CommitRepository
         $tag = $push->getTagName();
 
         foreach ($push->getData('commits', []) as $commit) {
-            Commit::create([
+            Commit::updateOrCreate([
                 'repository_id' => $repositoryId,
-                'ref' => $ref,
                 'sha' => $commit['id'],
+            ], [
+                'ref' => $ref,
                 'tag' => ($commit['id'] === $push->getData('after') ? $tag : null),
                 'data' => [
                     'message' => $commit['message'],
