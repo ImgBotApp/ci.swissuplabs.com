@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\PushEvent;
+use App\Push;
 use Illuminate\Queue\SerializesModels;
 
 class PushRecieved
@@ -14,9 +14,9 @@ class PushRecieved
     /**
      * Create a new event instance.
      *
-     * @param PushEvent $push
+     * @param Push $push
      */
-    public function __construct(PushEvent $push)
+    public function __construct(Push $push)
     {
         $this->push = $push;
     }

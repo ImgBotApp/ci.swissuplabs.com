@@ -2,37 +2,37 @@
 
 namespace App;
 
-class EventRepository
+class CommitRepository
 {
-    public static function add(PushEvent $event)
+    public static function add(Push $push)
     {
-        if ($event->isDeleted()) {
+        if ($push->isDeleted()) {
             return;
         }
 
-        if (!$event->isTag() && $event->getRef() !== 'refs/heads/master') {
+        if (!$push->isTag() && $push->getRef() !== 'refs/heads/master') {
             // @todo: configurable refs
             return;
         }
 
         // save repository
         $repository = Repository::firstOrCreate([
-            'owner' => $event->getRepositoryOwnerName(),
-            'name' => $event->getRepositoryName(),
-            'url' => $event->getRepositoryUrl(),
+            'owner' => $push->getRepositoryOwnerName(),
+            'name' => $push->getRepositoryName(),
+            'url' => $push->getRepositoryUrl(),
         ]);
 
         // save commits
         $repositoryId = $repository->getKey();
-        $ref = $event->isTag() ? $event->getData('base_ref') : $event->getRef();
-        $tag = $event->getTagName();
+        $ref = $push->isTag() ? $push->getData('base_ref') : $push->getRef();
+        $tag = $push->getTagName();
 
-        foreach ($event->getData('commits', []) as $commit) {
+        foreach ($push->getData('commits', []) as $commit) {
             Commit::create([
                 'repository_id' => $repositoryId,
                 'ref' => $ref,
                 'sha' => $commit['id'],
-                'tag' => ($commit['id'] === $event->getData('after') ? $tag : null),
+                'tag' => ($commit['id'] === $push->getData('after') ? $tag : null),
                 'data' => [
                     'message' => $commit['message'],
                     'author' => $commit['author'],

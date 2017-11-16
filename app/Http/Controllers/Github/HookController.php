@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Github;
 
 use App\Events\PushRecieved;
-use App\PushEvent;
-use App\EventRepository;
+use App\Push;
+use App\CommitRepository;
 use Illuminate\Http\Request;
 use App\Jobs\DebouncedJob;
 use App\Jobs\ValidateGithubCommit;
@@ -19,12 +19,12 @@ class HookController extends Controller
             return;
         }
 
-        $pushEvent = new PushEvent($request->getContent());
+        $push = new Push($request->getContent());
 
-        if (in_array($pushEvent->getRepositoryFullName(), config('repositories.ignore'))) {
+        if (in_array($push->getRepositoryFullName(), config('repositories.ignore'))) {
             return;
         }
 
-        event(new PushRecieved($pushEvent));
+        event(new PushRecieved($push));
     }
 }

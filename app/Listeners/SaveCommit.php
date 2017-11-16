@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\EventRepository;
+use App\CommitRepository;
 use App\Events\PushRecieved;
 
 class SaveCommit
@@ -19,6 +19,6 @@ class SaveCommit
             return;
         }
 
-        EventRepository::add($event->push);
+        CommitRepository::add($event->push);
     }
 }

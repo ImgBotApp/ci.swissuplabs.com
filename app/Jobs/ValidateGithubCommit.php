@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App;
 use Activity;
-use App\PushEvent;
+use App\Push;
 use App\Lib\Terminal;
 use App\Downloader\Github as GithubDownloader;
 use Illuminate\Bus\Queueable;
@@ -30,18 +30,18 @@ class ValidateGithubCommit implements ShouldQueue
     public $tries = 1;
 
     /**
-     * @var PushEvent
+     * @var Push
      */
-    protected $pushEvent;
+    protected $push;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(PushEvent $pushEvent)
+    public function __construct(Push $push)
     {
-        $this->pushEvent = $pushEvent;
+        $this->push = $push;
     }
 
     /**
@@ -73,7 +73,7 @@ class ValidateGithubCommit implements ShouldQueue
                 count($result)
             );
 
-            $this->pushEvent->createCommitStatus(
+            $this->push->createCommitStatus(
                 $status,
                 $description,
                 $targetUrl
@@ -81,10 +81,10 @@ class ValidateGithubCommit implements ShouldQueue
 
             // Send notification if previous commit passed all tests only
             if ($status !== self::SUCCESS &&
-                $this->pushEvent->getPreviousCommitStatus() === self::SUCCESS) {
+                $this->push->getPreviousCommitStatus() === self::SUCCESS) {
 
-                $compareUrl = $this->pushEvent->getCompareUrl();
-                $this->pushEvent->createCommitComment(sprintf(
+                $compareUrl = $this->push->getCompareUrl();
+                $this->push->createCommitComment(sprintf(
                     "Please verify your [commit](%s) as it didn't pass [some tests](%s)",
                     $compareUrl,
                     $targetUrl
@@ -94,7 +94,7 @@ class ValidateGithubCommit implements ShouldQueue
         } catch (\Github\Exception\RuntimeException $e) {
             throw $e;
         } catch (\Exception $e) {
-            $this->pushEvent->createCommitStatus(self::FAILURE, 'Internal server error');
+            $this->push->createCommitStatus(self::FAILURE, 'Internal server error');
             throw $e;
         }
     }
@@ -107,8 +107,8 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function saveResult($testResults)
     {
-        $sha = $this->pushEvent->getSha();
-        $repository = $this->pushEvent->getRepositoryFullName();
+        $sha = $this->push->getSha();
+        $repository = $this->push->getRepositoryFullName();
 
         $data = [
             'sha'        => $sha,
@@ -135,10 +135,10 @@ class ValidateGithubCommit implements ShouldQueue
     {
         $downloader = new GithubDownloader;
         $downloader->download([
-            'username'   => $this->pushEvent->getRepositoryOwnerName(),
-            'repository' => $this->pushEvent->getRepositoryName(),
-            'ref'        => $this->pushEvent->getRef()
-        ], $this->pushEvent->getRepositoryFullName());
+            'username'   => $this->push->getRepositoryOwnerName(),
+            'repository' => $this->push->getRepositoryName(),
+            'ref'        => $this->push->getRef()
+        ], $this->push->getRepositoryFullName());
 
         return $this;
     }
@@ -151,7 +151,7 @@ class ValidateGithubCommit implements ShouldQueue
      */
     private function removeSources()
     {
-        Storage::deleteDirectory($this->pushEvent->getRepositoryFullName());
+        Storage::deleteDirectory($this->push->getRepositoryFullName());
 
         return $this;
     }
@@ -168,8 +168,8 @@ class ValidateGithubCommit implements ShouldQueue
 
         foreach (config('tests') as $class) {
             $test = (new $class)
-                ->setPath(storage_path('app/' . $this->pushEvent->getRepositoryFullName()))
-                ->setRepositoryType($this->pushEvent->getRepositoryType());
+                ->setPath(storage_path('app/' . $this->push->getRepositoryFullName()))
+                ->setRepositoryType($this->push->getRepositoryType());
 
             if (!$test->canRun()) {
                 continue;

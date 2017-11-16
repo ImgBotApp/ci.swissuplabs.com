@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\PushEvent;
+use App\Push;
 use App\Lib\Github;
 use App\Lib\Terminal;
 use App\Downloader\Github as GithubDownloader;
@@ -25,9 +25,9 @@ class UpdateComposerPackages implements ShouldQueue
     public $tries = 2;
 
     /**
-     * @var PushEvent
+     * @var Push
      */
-    protected $pushEvent;
+    protected $push;
 
     /**
      * Satis packages repository settings
@@ -46,12 +46,12 @@ class UpdateComposerPackages implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param PushEvent $pushEvent
+     * @param Push $push
      * @return void
      */
-    public function __construct(PushEvent $pushEvent)
+    public function __construct(Push $push)
     {
-        $this->pushEvent = $pushEvent;
+        $this->push = $push;
     }
 
     /**
@@ -208,7 +208,7 @@ class UpdateComposerPackages implements ShouldQueue
      */
     protected function getSatisSettings()
     {
-        $type = $this->pushEvent->getRepositoryType();
+        $type = $this->push->getRepositoryType();
 
         foreach (config('satis') as $key => $values) {
             if (!in_array($type, $values['types'])) {

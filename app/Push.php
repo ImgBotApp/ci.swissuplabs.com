@@ -4,7 +4,7 @@ namespace App;
 
 use App\Lib\Github;
 
-class PushEvent
+class Push
 {
     protected $payload;
 
