@@ -6,10 +6,6 @@ class CommitRepository
 {
     public static function addFromPush(Push $push)
     {
-        if ($push->isDeleted()) {
-            return;
-        }
-
         if (!$push->isTag() && $push->getRef() !== 'refs/heads/master') {
             // @todo: configurable refs
             return;
