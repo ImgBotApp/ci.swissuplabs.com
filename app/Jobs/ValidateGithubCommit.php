@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App;
 use Activity;
+use App\Events\PushValidated;
 use App\Push;
 use App\Lib\Terminal;
 use App\Downloader\Github as GithubDownloader;
@@ -66,6 +67,8 @@ class ValidateGithubCommit implements ShouldQueue
                 $status = self::ERROR;
                 $targetUrl = $this->saveResult($result);
             }
+
+            event(new PushValidated($this->push, $status));
 
             $description = sprintf(
                 "%s / %s checks OK",

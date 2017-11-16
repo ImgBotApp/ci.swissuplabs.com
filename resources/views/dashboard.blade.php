@@ -64,7 +64,7 @@
                             </ul>
                         </div>
                     </td>
-                    <td><span class="label success outline">Success</span></td>
+                    <td><span class="label {{ $repository->commits[0]->status }} outline">{{ $repository->commits[0]->status }}</span></td>
                 </tr>
             @endforeach
             </tbody>

@@ -14,9 +14,12 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         'App\Events\PushRecieved' => [
+            'App\Listeners\SaveCommit',
             'App\Listeners\ValidateCommit',
             'App\Listeners\UpdatePackages',
-            'App\Listeners\SaveCommit',
+        ],
+        'App\Events\PushValidated' => [
+            'App\Listeners\UpdateCommitStatus',
         ],
     ];
 
