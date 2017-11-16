@@ -63,8 +63,6 @@
                 margin-bottom: 30px;
             }
         </style>
-
-        @include('googletag')
     </head>
     <body>
         <div class="flex-center position-ref full-height">
@@ -83,7 +81,5 @@
                 </div>
             </div>
         </div>
-
-        @include('analytics')
     </body>
 </html>
