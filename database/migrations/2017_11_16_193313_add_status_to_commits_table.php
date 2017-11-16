@@ -14,7 +14,7 @@ class AddStatusToCommitsTable extends Migration
     public function up()
     {
         Schema::table('commits', function (Blueprint $table) {
-            $table->string('status', 16)->after('sha');
+            $table->string('status', 16)->nullable()->after('sha');
         });
     }
 
