@@ -4,7 +4,7 @@ namespace App;
 
 class CommitRepository
 {
-    public static function add(Push $push)
+    public static function addFromPush(Push $push)
     {
         if ($push->isDeleted()) {
             return;

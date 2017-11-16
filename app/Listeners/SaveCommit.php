@@ -19,6 +19,6 @@ class SaveCommit
             return;
         }
 
-        CommitRepository::add($event->push);
+        CommitRepository::addFromPush($event->push);
     }
 }
