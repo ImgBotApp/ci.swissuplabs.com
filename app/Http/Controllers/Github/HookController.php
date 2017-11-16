@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Github;
 
+use App\Events\PushRecieved;
 use App\PushEvent;
 use App\EventRepository;
 use Illuminate\Http\Request;
@@ -20,29 +21,10 @@ class HookController extends Controller
 
         $pushEvent = new PushEvent($request->getContent());
 
-        if (!$this->canHandle($pushEvent)) {
+        if (in_array($pushEvent->getRepositoryFullName(), config('repositories.ignore'))) {
             return;
         }
 
-        if ($pushEvent->isTag()) {
-            DebouncedJob::dispatch(new UpdateComposerPackages($pushEvent), 600);
-        } else {
-            ValidateGithubCommit::dispatch($pushEvent);
-        }
-
-        EventRepository::add($pushEvent);
-    }
-
-    /**
-     * Check if we should handle request
-     *
-     * @return boolean
-     */
-    protected function canHandle(PushEvent $pushEvent)
-    {
-        $ignored = config('repositories.ignore');
-
-        return !$pushEvent->isDeleted()
-            && !in_array($pushEvent->getRepositoryFullName(), $ignored);
+        event(new PushRecieved($pushEvent));
     }
 }
