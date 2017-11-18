@@ -55,50 +55,31 @@ class ValidateGithubCommit implements ShouldQueue
     public function handle()
     {
         try {
-            $status = self::SUCCESS;
-            $targetUrl = '';
+            $status = self::FAILURE;
+            $result = [];
+            $errors = [];
+            $resultUrl = '';
 
             $this->downloadSources();
             $result = $this->runTests();
             $this->removeSources();
 
-            $failedTests = array_filter($result);
-            if ($failedTests) {
-                $status = self::ERROR;
-                $targetUrl = $this->saveResult($result);
+            $errors = array_filter($result);
+            $status = $errors ? self::ERROR : self::SUCCESS;
+            if ($errors) {
+                $resultUrl = $this->saveResult($result);
             }
-
-            event(new PushValidated($this->push, $status));
-
-            $description = sprintf(
-                "%s / %s checks OK",
-                count($result) - count($failedTests),
-                count($result)
-            );
-
-            $this->push->createCommitStatus(
-                $status,
-                $description,
-                $targetUrl
-            );
-
-            // Send notification if previous commit passed all tests only
-            if ($status !== self::SUCCESS &&
-                $this->push->getPreviousCommitStatus() === self::SUCCESS) {
-
-                $compareUrl = $this->push->getCompareUrl();
-                $this->push->createCommitComment(sprintf(
-                    "Please verify your [commit](%s) as it didn't pass [some tests](%s)",
-                    $compareUrl,
-                    $targetUrl
-                ));
-            }
-
         } catch (\Github\Exception\RuntimeException $e) {
             throw $e;
         } catch (\Exception $e) {
-            $this->push->createCommitStatus(self::FAILURE, 'Internal server error');
             throw $e;
+        } finally {
+            event(new PushValidated($this->push, [
+                'status' => $status,
+                'errors' => $errors,
+                'result' => $result,
+                'resultUrl' => $resultUrl,
+            ]));
         }
     }
 

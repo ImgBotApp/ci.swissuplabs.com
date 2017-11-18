@@ -15,18 +15,19 @@ class PushValidated
     public $push;
 
     /**
-     * @var string
+     * @var array
      */
-    public $status;
+    public $data;
 
     /**
      * Create a new event instance.
      *
      * @param Push $push
+     * @param array $data
      */
-    public function __construct(Push $push, $status)
+    public function __construct(Push $push, array $data)
     {
         $this->push = $push;
-        $this->status = $status;
+        $this->data = $data;
     }
 }
