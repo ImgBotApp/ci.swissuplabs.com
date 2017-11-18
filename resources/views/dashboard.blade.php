@@ -57,14 +57,18 @@
                             <ul>
                                 @foreach ($repository->commits as $commit)
                                     <li class="py1 smaller">
-                                        <b>{{ $commit->created_at }}</b><br/>
+                                        <b>@timezone($commit->created_at)</b><br/>
                                         {{ $commit->data['message'] }}
                                     </li>
                                 @endforeach
                             </ul>
                         </div>
                     </td>
-                    <td><span class="label {{ $repository->commits[0]->status }} outline">{{ $repository->commits[0]->status }}</span></td>
+                    <td>
+                        <span class="label {{ $repository->commits[0]->status }} outline">
+                            {{ $repository->commits[0]->status }}
+                        </span>
+                    </td>
                 </tr>
             @endforeach
             </tbody>
