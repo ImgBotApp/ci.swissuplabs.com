@@ -1,7 +1,13 @@
 (function() {
-    var timezone = moment.tz.guess();
+    var timezone = false;
+    try {
+        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch (e) {
+        //
+    }
+
     if (timezone) {
-        Cookies.set('tz', moment.tz.guess());
+        Cookies.set('tz', timezone);
     } else {
         Cookies.remove('tz');
     }
