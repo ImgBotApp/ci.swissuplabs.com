@@ -179,7 +179,7 @@ if("undefined"==typeof jQuery)throw new Error("Kube's requires jQuery");!functio
     }
 
     if (timezone) {
-        Cookies.set('tz', timezone);
+        Cookies.set('tz', timezone, { expires: 365 });
     } else {
         Cookies.remove('tz');
     }
