@@ -21,6 +21,6 @@ class UpdateController extends Controller
             return;
         }
 
-        Artisan::queue('app:setup');
+        Artisan::queue('app:update');
     }
 }
