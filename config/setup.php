@@ -51,7 +51,7 @@ return [
                 'active' => true,
                 'username' => 'magento',
                 'repository' => 'magento2',
-                'ref' => '2.1.9',
+                'ref' => '2.2.1',
                 'postinstall' => [
                     sprintf(
                         "%s/vendor/bin/phpcs --config-set m2-path %s",
