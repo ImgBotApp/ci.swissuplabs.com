@@ -23,7 +23,8 @@ class DashboardController extends Controller
             )
             ->with([
                 'commits' => function ($query) use ($activitySince) {
-                    $query->where('created_at', '>', $activitySince)->latest();
+                    $query->where('created_at', '>', $activitySince)
+                        ->orderBy('id', 'desc');
                 }
             ])
             ->get()
