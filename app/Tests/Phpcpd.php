@@ -32,7 +32,7 @@ class Phpcpd extends Test
         $command = implode(' && ', [
             sprintf(
                 // "%s --fuzzy -vvv --min-lines=3 --min-tokens=30 %s",
-                "%s --regexps-exclude '~Setup~,~lib~,~sql~' --fuzzy -vvv %s",
+                "%s --regexps-exclude '~Setup~,~Test~,~lib~,~sql~' --fuzzy -vvv %s",
                 storage_path('app/tools/phpcpd'),
                 escapeshellarg($this->getPath())
             )
