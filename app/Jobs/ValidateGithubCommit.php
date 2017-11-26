@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App;
-use Activity;
 use App\Events\PushValidated;
 use App\Push;
 use App\Lib\Terminal;

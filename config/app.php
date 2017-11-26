@@ -178,7 +178,6 @@ return [
         /**
          * Third-party providers
          */
-        Spatie\Activitylog\ActivitylogServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Clockwork\Support\Laravel\ClockworkServiceProvider::class,
 
@@ -239,8 +238,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
-        'Activity' => Spatie\Activitylog\ActivitylogFacade::class,
     ],
 
 ];
