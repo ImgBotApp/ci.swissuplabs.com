@@ -32,8 +32,8 @@
     php artisan migrate
     php artisan app:setup
 
-    # 6. install npm modules (omit `--production` key if you are frontend developer)
-    npm install --production
+    # 6. install npm modules (if you are frontend developer)
+    npm install
 
     # 7. run the site (skip this step if you have a ready to use webserver)
     php artisan serve
