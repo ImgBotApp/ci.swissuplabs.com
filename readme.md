@@ -2,7 +2,7 @@
 
 ## Requirements
 
- -  PHP 5.6 and newer
+ -  PHP 7.0 and newer
  -  Node 6.11.2 and NPM
  -  Composer
  -  Git
