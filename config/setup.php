@@ -5,14 +5,21 @@ return [
     'config' => [
         'github.secret' => [
             'env_key' => 'GITHUB_SECRET',
-            'prompt'  => 'Enter webhook secret key'
+            'prompt'  => 'Enter webhook secret key',
+            'method'  => 'secret',
         ],
         'github.token' => [
             'env_key' => 'GITHUB_TOKEN',
             'prompt'  => 'Enter github token',
+            'method'  => 'secret',
             'postinstall' => [
                 'composer:config'
             ]
+        ],
+        'app.report_to' => [
+            'env_key' => 'APP_REPORT_TO',
+            'prompt'  => 'Enter email to use for error reporting',
+            'method'  => 'ask',
         ],
     ],
 

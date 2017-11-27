@@ -110,7 +110,8 @@ class SetupApplication extends Command
                 continue;
             }
 
-            $input = $this->secret($values['prompt']);
+            $method = $values['method'];
+            $input = $this->{$method}($values['prompt']);
 
             if (!$this->setEnvironmentFileValue($values['env_key'], $input)) {
                 return;
